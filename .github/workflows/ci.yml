@@ -1,0 +1,73 @@
+name: Tests
+on: push
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    container:
+      image: kirschbaumdevelopment/laravel-test-runner:7.4
+
+    services:
+      couchbase:
+        image: couchbase:6.6.0
+        ports:
+          - 8091-8094:8091-8094
+          - 11210:11210
+
+    strategy:
+      matrix:
+        php: [ 7.3 ]
+
+    name: PHP ${{ matrix.php }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, couchbase
+          coverage: none
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: PHP Install Dependencies (if not cached)
+        if: steps.composer-cache.outputs.cache-hit != 'true'
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest  --no-progress --prefer-dist
+
+      - name: Couchbase - Initialize cluster
+        run: |
+          cqq --version
+          php artisan couchbase:cluster:init
+
+      - name: Couchbase - Verify connection
+        run: |
+          couchbase-cli --version
+          php artisan couchbase:bucket:list
+
+      - name: Couchbase - Create bucket
+        run: |
+          couchbase-cli --version
+          php artisan couchbase:bucket:create
+
+      - name: Couchbase - Create primary index
+        run: |
+          cbq --version
+          php artisan couchbase:bucket:index:create
+
+
+
+      - name: Run Testsuite
+        run: vendor/bin/phpunit

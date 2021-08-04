@@ -1,0 +1,12 @@
+.DS_Store
+phpunit.phar
+/vendor
+composer.phar
+composer.lock
+*.sublime-project
+*.sublime-workspace
+*.project
+.idea/
+.env
+.php-cs-fixer.cache
+sql-log.sql

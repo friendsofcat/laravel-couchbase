@@ -1,0 +1,45 @@
+{
+    "name": "friendsofcat/laravel-couchbase",
+    "version": "1.0.0",
+    "description": "A Couchbase based Eloquent model and Query builder for Laravel",
+    "keywords": ["laravel","eloquent","couchbase","database","model"],
+    "homepage": "https://github.com/friendsoat/laravel-couchbase",
+    "license" : "MIT",
+    "require": {
+        "php": "^7.3|^8.0",
+        "illuminate/support": "^7.0|^8.0",
+        "illuminate/container": "^7.0|^8.0",
+        "illuminate/database": "^7.0|^8.0",
+        "illuminate/events": "^7.0|^8.0",
+        "ext-couchbase": ">=3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.5|^9.3.3",
+        "orchestra/testbench": "^6.18.0",
+        "mockery/mockery": "^1.4.2",
+        "ext-json": "*",
+        "vlucas/phpdotenv": "^5.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "FriendsOfCat\\Couchbase\\": "src/FriendsOfCat/Couchbase/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "FriendsOfCat\\Couchbase\\CouchbaseServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "check-style": "php-cs-fixer fix --dry-run",
+        "fix-style": "php-cs-fixer fix",
+        "test": "./vendor/bin/phpunit"
+    }
+}

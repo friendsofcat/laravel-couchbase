@@ -3,8 +3,6 @@ on: push
 jobs:
   tests:
     runs-on: ubuntu-latest
-    container:
-      image: kirschbaumdevelopment/laravel-test-runner:7.4
 
     services:
       couchbase:

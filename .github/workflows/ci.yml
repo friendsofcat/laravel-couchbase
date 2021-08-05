@@ -30,12 +30,10 @@ jobs:
           coverage: none
 
       - name: Get Composer Cache Directory
-        id: composer-cache
         run: |
           echo "::set-output name=dir::$(composer config cache-files-dir)"
 
       - name: Cache Composer packages
-        id: composer-cache
         uses: actions/cache@v2
         with:
           path: vendor

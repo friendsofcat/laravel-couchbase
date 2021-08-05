@@ -1,6 +1,6 @@
 {
     "name": "friendsofcat/laravel-couchbase",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "description": "A Couchbase based Eloquent model and Query builder for Laravel",
     "keywords": ["laravel","eloquent","couchbase","database","model"],
     "homepage": "https://github.com/friendsoat/laravel-couchbase",

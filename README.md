@@ -73,9 +73,6 @@ composer require friendsofcat/laravel-couchbase
     'port'     => env('DB_PORT', 8091),
     'bucket'   => env('DB_DATABASE'),
     'username' => env('DB_USERNAME'),
-    'n1ql_hosts' => [
-        'http://'.env('DB_HOST', 'localhost').':8093'
-    ]
 ],
 ```
 
@@ -88,10 +85,6 @@ composer require friendsofcat/laravel-couchbase
     'port'     => env('DB_PORT', 8091),
     'bucket'   => env('DB_DATABASE'),
     'username' => env('DB_USERNAME'),
-    'n1ql_hosts' => [
-        'http://host1:8093',
-        'http://host2:8093'
-    ]
 ],
 ```
 
@@ -108,7 +101,7 @@ class User extends Eloquent {
 More on that on [eloquent section below](#eloquent)
 
 
-Before usage
+Before usage in Laravel
 ---
 Note that all the following commands can be done on the browser at `localhost:8091`
 - Init cluster before any usage
@@ -117,7 +110,7 @@ php artisan couchbase:cluster:init
 ```
 - Create a bucket
 ```bash
-php artisan couchbase:bucket:create canvas
+php artisan couchbase:bucket:create --bucket canvas
 ```
 
 

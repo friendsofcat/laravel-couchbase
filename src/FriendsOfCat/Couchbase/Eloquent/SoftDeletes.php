@@ -1,8 +1,9 @@
-<?php 
+<?php
 
 namespace FriendsOfCat\Couchbase\Eloquent;
 
-trait SoftDeletes {
+trait SoftDeletes
+{
     use \Illuminate\Database\Eloquent\SoftDeletes;
 
     /**
@@ -10,7 +11,8 @@ trait SoftDeletes {
      *
      * @return string
      */
-    public function getQualifiedDeletedAtColumn() {
+    public function getQualifiedDeletedAtColumn()
+    {
         return $this->getDeletedAtColumn();
     }
 }

@@ -1,9 +1,9 @@
 <?php
 
-
 namespace FriendsOfCat\Couchbase\Schema;
 
-class Blueprint extends \Illuminate\Database\Schema\Blueprint {
+class Blueprint extends \Illuminate\Database\Schema\Blueprint
+{
     /**
      * Fluent columns.
      *
@@ -20,7 +20,8 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint {
      * @param string|null $algorithm
      * @return Blueprint
      */
-    public function index($columns = null, $name = null, $algorithm = null, $options = []) {
+    public function index($columns = null, $name = null, $algorithm = null, $options = [])
+    {
         return $this;
     }
 
@@ -33,7 +34,8 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint {
      * @param array $options
      * @return \Illuminate\Support\Fluent
      */
-    public function primary($columns = null, $name = null, $algorithm = null, $options = []) {
+    public function primary($columns = null, $name = null, $algorithm = null, $options = [])
+    {
         return $this;
     }
 
@@ -43,7 +45,8 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint {
      * @param string|array $columns
      * @return Blueprint
      */
-    public function dropIndex($columns = null) {
+    public function dropIndex($columns = null)
+    {
         return $this;
     }
 
@@ -56,7 +59,8 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint {
      * @param array $options
      * @return Blueprint
      */
-    public function unique($columns = null, $name = null, $algorithm = null, $options = []) {
+    public function unique($columns = null, $name = null, $algorithm = null, $options = [])
+    {
         return $this;
     }
 
@@ -65,7 +69,8 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint {
      *
      * @return bool
      */
-    public function create() {
+    public function create()
+    {
         return true;
     }
 
@@ -74,7 +79,8 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint {
      *
      * @return bool
      */
-    public function drop() {
+    public function drop()
+    {
         return true;
     }
 
@@ -86,7 +92,8 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint {
      * @param array $parameters
      * @return Blueprint
      */
-    public function addColumn($type, $name, array $parameters = []) {
+    public function addColumn($type, $name, array $parameters = [])
+    {
         return $this;
     }
 
@@ -95,7 +102,8 @@ class Blueprint extends \Illuminate\Database\Schema\Blueprint {
      *
      * @return Blueprint
      */
-    public function __call($method, $args) {
+    public function __call($method, $args)
+    {
         // Dummy.
         return $this;
     }

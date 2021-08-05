@@ -1,13 +1,14 @@
-<?php 
+<?php
 
 namespace FriendsOfCat\Couchbase\Relations;
 
+use FriendsOfCat\Couchbase\Helper;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Pagination\Paginator;
-use FriendsOfCat\Couchbase\Helper;
 
-class EmbedsMany extends EmbedsOneOrMany {
+class EmbedsMany extends EmbedsOneOrMany
+{
     /**
      * Initialize the relation on a set of models.
      *
@@ -15,7 +16,8 @@ class EmbedsMany extends EmbedsOneOrMany {
      * @param string $relation
      * @return array
      */
-    public function initRelation(array $models, $relation) {
+    public function initRelation(array $models, $relation)
+    {
         foreach ($models as $model) {
             $model->setRelation($relation, $this->related->newCollection());
         }
@@ -28,7 +30,8 @@ class EmbedsMany extends EmbedsOneOrMany {
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getResults() {
+    public function getResults()
+    {
         return $this->toCollection($this->getEmbedded());
     }
 
@@ -38,10 +41,11 @@ class EmbedsMany extends EmbedsOneOrMany {
      * @param \Illuminate\Database\Eloquent\Model $model
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function performInsert(Model $model) {
+    public function performInsert(Model $model)
+    {
         // Generate a new key if needed.
 
-        if ($model->getKeyName() == '_id' and !$model->getKey()) {
+        if ($model->getKeyName() == '_id' and ! $model->getKey()) {
             $model->setAttribute('_id', Helper::getUniqueId($model->{Helper::TYPE_NAME}));
         }
         // For deeply nested documents, let the parent handle the changes.
@@ -68,7 +72,8 @@ class EmbedsMany extends EmbedsOneOrMany {
      * @param \Illuminate\Database\Eloquent\Model $model
      * @return Model|bool
      */
-    public function performUpdate(Model $model) {
+    public function performUpdate(Model $model)
+    {
         // For deeply nested documents, let the parent handle the changes.
         if ($this->isNested()) {
             $this->associate($model);
@@ -88,8 +93,12 @@ class EmbedsMany extends EmbedsOneOrMany {
         })->toArray();
 
         // Update document in database.
-        $result = $this->getBaseQuery()->forIn(str_singular($this->localKey) . '.' . $model->getKeyName(), $foreignKey,
-            $this->localKey, $newValues)
+        $result = $this->getBaseQuery()->forIn(
+            str_singular($this->localKey) . '.' . $model->getKeyName(),
+            $foreignKey,
+            $this->localKey,
+            $newValues
+        )
             ->update([]);
 
         // Attach the model to its parent.
@@ -106,7 +115,8 @@ class EmbedsMany extends EmbedsOneOrMany {
      * @param Model $model
      * @return int
      */
-    public function performDelete(Model $model) {
+    public function performDelete(Model $model)
+    {
         // For deeply nested documents, let the parent handle the changes.
         if ($this->isNested()) {
             $this->dissociate($model);
@@ -132,8 +142,9 @@ class EmbedsMany extends EmbedsOneOrMany {
      * @param \Illuminate\Database\Eloquent\Model $model
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function associate(Model $model) {
-        if (!$this->contains($model)) {
+    public function associate(Model $model)
+    {
+        if (! $this->contains($model)) {
             return $this->associateNew($model);
         } else {
             return $this->associateExisting($model);
@@ -146,7 +157,8 @@ class EmbedsMany extends EmbedsOneOrMany {
      * @param mixed $ids
      * @return int
      */
-    public function dissociate($ids = []) {
+    public function dissociate($ids = [])
+    {
         $ids = $this->getIdsArrayFrom($ids);
 
         $records = $this->getEmbedded();
@@ -174,7 +186,8 @@ class EmbedsMany extends EmbedsOneOrMany {
      * @param mixed $ids
      * @return int
      */
-    public function destroy($ids = []) {
+    public function destroy($ids = [])
+    {
         $count = 0;
 
         $ids = $this->getIdsArrayFrom($ids);
@@ -197,7 +210,8 @@ class EmbedsMany extends EmbedsOneOrMany {
      *
      * @return int
      */
-    public function delete() {
+    public function delete()
+    {
         // Overwrite the local key with an empty array.
         $result = $this->query->update([$this->localKey => []]);
 
@@ -214,7 +228,8 @@ class EmbedsMany extends EmbedsOneOrMany {
      * @param mixed $ids
      * @return int
      */
-    public function detach($ids = []) {
+    public function detach($ids = [])
+    {
         return $this->destroy($ids);
     }
 
@@ -224,7 +239,8 @@ class EmbedsMany extends EmbedsOneOrMany {
      * @param \Illuminate\Database\Eloquent\Model $model
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function attach(Model $model) {
+    public function attach(Model $model)
+    {
         return $this->save($model);
     }
 
@@ -234,9 +250,10 @@ class EmbedsMany extends EmbedsOneOrMany {
      * @param \Illuminate\Database\Eloquent\Model $model
      * @return \Illuminate\Database\Eloquent\Model
      */
-    protected function associateNew($model) {
+    protected function associateNew($model)
+    {
         // Create a new key if needed.
-        if (!$model->getAttribute('_id')) {
+        if (! $model->getAttribute('_id')) {
             $model->setAttribute('_id', Helper::getUniqueId($model->{Helper::TYPE_NAME}));
         }
 
@@ -254,7 +271,8 @@ class EmbedsMany extends EmbedsOneOrMany {
      * @param \Illuminate\Database\Eloquent\Model $model
      * @return \Illuminate\Database\Eloquent\Model
      */
-    protected function associateExisting($model) {
+    protected function associateExisting($model)
+    {
         // Get existing embedded documents.
         $records = $this->getEmbedded();
 
@@ -266,6 +284,7 @@ class EmbedsMany extends EmbedsOneOrMany {
         foreach ($records as &$record) {
             if ($record[$primaryKey] == $key) {
                 $record = $model->getAttributes();
+
                 break;
             }
         }
@@ -279,7 +298,8 @@ class EmbedsMany extends EmbedsOneOrMany {
      * @param int $perPage
      * @return \Illuminate\Pagination\Paginator
      */
-    public function paginate($perPage = null) {
+    public function paginate($perPage = null)
+    {
         $page = Paginator::resolveCurrentPage();
         $perPage = $perPage ?: $this->related->getPerPage();
 
@@ -300,7 +320,8 @@ class EmbedsMany extends EmbedsOneOrMany {
      *
      * @return array
      */
-    protected function getEmbedded() {
+    protected function getEmbedded()
+    {
         return parent::getEmbedded() ?: [];
     }
 
@@ -309,8 +330,9 @@ class EmbedsMany extends EmbedsOneOrMany {
      *
      * @param array $models
      */
-    protected function setEmbedded($models) {
-        if (!is_array($models)) {
+    protected function setEmbedded($models)
+    {
+        if (! is_array($models)) {
             $models = [$models];
         }
 
@@ -324,7 +346,8 @@ class EmbedsMany extends EmbedsOneOrMany {
      * @param array $parameters
      * @return mixed
      */
-    public function __call($method, $parameters) {
+    public function __call($method, $parameters)
+    {
         if (method_exists('Illuminate\Database\Eloquent\Collection', $method)) {
             return call_user_func_array([$this->getResults(), $method], $parameters);
         }

@@ -60,13 +60,12 @@ jobs:
       - name: Couchbase - Create bucket
         run: |
           couchbase-cli --version
-          php artisan couchbase:bucket:create
+          php artisan couchbase:bucket:create --enable-flush=true
 
       - name: Couchbase - Create primary index
         run: |
           cbq --version
-          php artisan couchbase:bucket:index:create
-
+          php artisan couchbase:bucket:create-primary-index
 
 
       - name: Run Testsuite

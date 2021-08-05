@@ -1,14 +1,16 @@
 <?php
 
 namespace Tests;
+
+use Tests\Models\User;
 use Illuminate\Support\Collection;
 use FriendsOfCat\Couchbase\Query\MissingValue;
-use Tests\Models\User;
 
-class QueryTest extends TestCase {
-    public function setUp(): void {
+class QueryTest extends TestCase
+{
+    public function setUp(): void
+    {
         parent::setUp();
-      User::truncate();
         User::create(['name' => 'John Doe', 'age' => 35, 'title' => 'admin']);
         User::create(['name' => 'Jane Doe', 'age' => 33, 'title' => 'admin']);
         User::create(['name' => 'Harry Hoe', 'age' => 13, 'title' => 'user']);
@@ -20,8 +22,8 @@ class QueryTest extends TestCase {
         User::create(['name' => 'Error', 'age' => null, 'title' => null]);
     }
 
-
-    public function testWhere() {
+    public function testWhere()
+    {
         $users = User::where('age', 35)->get();
         $this->assertEquals(3, count($users));
 
@@ -41,7 +43,8 @@ class QueryTest extends TestCase {
         $this->assertEquals(5, count($users));
     }
 
-    public function testAndWhere() {
+    public function testAndWhere()
+    {
         $users = User::where('age', 35)->where('title', 'admin')->get();
         $this->assertEquals(2, count($users));
 
@@ -49,17 +52,20 @@ class QueryTest extends TestCase {
         $this->assertEquals(2, count($users));
     }
 
-    public function testWhereIn() {
+    public function testWhereIn()
+    {
         $users = User::whereIn('age', [35, 33])->get();
         $this->assertEquals(5, count($users));
     }
 
-    public function testWhereNotIn() {
+    public function testWhereNotIn()
+    {
         $users = User::whereNotIn('age', [13, 23, 37, 33])->get();
         $this->assertEquals(3, count($users));
     }
 
-    public function testBetween() {
+    public function testBetween()
+    {
         $users = User::whereBetween('age', [0, 25])->get();
         $this->assertEquals(2, count($users));
         $users = User::whereBetween('age', [13, 23])->get();
@@ -69,7 +75,8 @@ class QueryTest extends TestCase {
         $this->assertEquals(6, count($users));
     }
 
-    public function testAggregations() {
+    public function testAggregations()
+    {
         $this->assertEquals(9, User::count());
 
         $this->assertEquals(37, User::max('age'));
@@ -81,7 +88,8 @@ class QueryTest extends TestCase {
         $this->assertEquals(244, User::sum('age'));
     }
 
-    public function testLike() {
+    public function testLike()
+    {
         $users = User::where('name', 'like', '%Doe')->get();
         $this->assertEquals(2, count($users));
 
@@ -95,7 +103,8 @@ class QueryTest extends TestCase {
         $this->assertEquals(1, count($users));
     }
 
-    public function testSelect() {
+    public function testSelect()
+    {
         $user = User::where('name', 'John Doe')->select('name')->first();
 
         $this->assertEquals('John Doe', $user->name);
@@ -120,7 +129,8 @@ class QueryTest extends TestCase {
         $this->assertEquals(null, $user->age);
     }
 
-    public function testOrWhere() {
+    public function testOrWhere()
+    {
         $users = User::where('age', 13)->orWhere('title', 'admin')->get();
         $this->assertEquals(4, count($users));
 
@@ -128,17 +138,20 @@ class QueryTest extends TestCase {
         $this->assertEquals(2, count($users));
     }
 
-    public function testWhereNull() {
+    public function testWhereNull()
+    {
         $users = User::whereNull('age')->get();
         $this->assertEquals(1, count($users));
     }
 
-    public function testWhereNotNull() {
+    public function testWhereNotNull()
+    {
         $users = User::whereNotNull('age')->get();
         $this->assertEquals(8, count($users));
     }
 
-    public function testOrder() {
+    public function testOrder()
+    {
         $user = User::whereNotNull('age')->orderBy('age', 'asc')->first();
         $this->assertEquals(13, $user->age);
 
@@ -146,17 +159,20 @@ class QueryTest extends TestCase {
         $this->assertEquals(37, $user->age);
     }
 
-    public function testCount() {
+    public function testCount()
+    {
         $count = User::where('age', '<>', 35)->count();
         $this->assertEquals(5, $count);
     }
 
-    public function testExists() {
+    public function testExists()
+    {
         $this->assertFalse(User::where('age', '>', 37)->exists());
         $this->assertTrue(User::where('age', '<', 37)->exists());
     }
 
-    public function testMultipleOr() {
+    public function testMultipleOr()
+    {
         $users = User::where(function ($query) {
             $query->where('age', 35)->orWhere('age', 33);
         })
@@ -167,7 +183,8 @@ class QueryTest extends TestCase {
         $this->assertEquals(2, count($users));
     }
 
-    public function testSubquery() {
+    public function testSubquery()
+    {
         $users = User::where('title', 'admin')->orWhere(function ($query) {
             $query->where('name', 'Tommy Toe')
                 ->orWhere('name', 'Error');
@@ -208,9 +225,9 @@ class QueryTest extends TestCase {
         $this->assertEquals(5, $users->count());
     }
 
-    public function testPaginate() {
+    public function testPaginate()
+    {
         $results = User::paginate(2);
-        dd($results);
         $this->assertEquals(2, $results->count());
         $this->assertNotNull($results->first()->title);
         $this->assertEquals(9, $results->total());
@@ -222,20 +239,23 @@ class QueryTest extends TestCase {
         $this->assertEquals(1, $results->currentPage());
     }
 
-    public function testPluckIdId() {
+    public function testPluckIdId()
+    {
         $result = User::query()->pluck('_id', '_id');
         $this->assertInstanceOf(Collection::class, $result);
         $this->assertGreaterThan(0, $result->count());
+
         foreach ($result as $key => $value) {
             $this->assertEquals($key, $value);
         }
     }
 
-    public function testCreateWithMissingValue() {
+    public function testCreateWithMissingValue()
+    {
         $user = User::create([
             'firstname' => 'Max1',
             'lastname' => 'Mustermann',
-            'username' => MissingValue::getMissingValue()
+            'username' => MissingValue::getMissingValue(),
         ]);
 
         $this->assertEquals('Max1', $user->firstname);
@@ -255,11 +275,12 @@ class QueryTest extends TestCase {
         $this->assertArrayNotHasKey('username', $user->getAttributes());
     }
 
-    public function testUpdateViaAttributesWithMissingValue() {
+    public function testUpdateViaAttributesWithMissingValue()
+    {
         $user = User::create([
             'firstname' => 'Max2',
             'lastname' => 'Mustermann',
-            'username' => 'max.mustermann'
+            'username' => 'max.mustermann',
         ]);
         $this->assertEquals('Max2', $user->firstname);
         $this->assertEquals('max.mustermann', $user->username);
@@ -282,18 +303,19 @@ class QueryTest extends TestCase {
         $this->assertArrayNotHasKey('username', $user->getAttributes());
     }
 
-    public function testUpdateViaMethodWithMissingValue() {
+    public function testUpdateViaMethodWithMissingValue()
+    {
         $user = User::create([
             'firstname' => 'Max3',
             'lastname' => 'Mustermann',
-            'username' => 'max.mustermann'
+            'username' => 'max.mustermann',
         ]);
         $this->assertEquals('Max3', $user->firstname);
         $this->assertEquals('max.mustermann', $user->username);
         $this->assertArrayHasKey('username', $user->getAttributes());
 
         $user->update([
-            'username' => MissingValue::getMissingValue()
+            'username' => MissingValue::getMissingValue(),
         ]);
 
         $this->assertEquals('Max3', $user->firstname);
@@ -307,32 +329,33 @@ class QueryTest extends TestCase {
         $this->assertArrayNotHasKey('username', $user->getAttributes());
     }
 
-    public function testUpdateWithMissingValueInSubLevel() {
+    public function testUpdateWithMissingValueInSubLevel()
+    {
         $user = User::create([
             'firstname' => 'Max4',
             'lastname' => 'Mustermann',
             'data' => [
                 'foo' => 'bar',
-                'abc' => 'def'
-            ]
+                'abc' => 'def',
+            ],
         ]);
         $this->assertEquals('Max4', $user->firstname);
         $this->assertEquals([
             'foo' => 'bar',
-            'abc' => 'def'
+            'abc' => 'def',
         ], $user->data);
         $this->assertArrayHasKey('foo', $user->data);
 
         $user->update([
             'data' => [
                 'foo' => MissingValue::getMissingValue(),
-                'abc' => 'def'
-            ]
+                'abc' => 'def',
+            ],
         ]);
 
         $this->assertEquals('Max4', $user->firstname);
         $this->assertEquals([
-            'abc' => 'def'
+            'abc' => 'def',
         ], $user->data);
         $this->assertArrayNotHasKey('foo', $user->data);
 
@@ -340,16 +363,17 @@ class QueryTest extends TestCase {
 
         $this->assertEquals('Max4', $user->firstname);
         $this->assertEquals([
-            'abc' => 'def'
+            'abc' => 'def',
         ], $user->data);
         $this->assertArrayNotHasKey('foo', $user->data);
     }
 
-    public function testDropValue() {
+    public function testDropValue()
+    {
         $user = User::create([
             'firstname' => 'Max6',
             'lastname' => 'Mustermann',
-            'username' => 'foobar'
+            'username' => 'foobar',
         ]);
         $this->assertEquals('Max6', $user->firstname);
         $this->assertArrayHasKey('username', $user->getAttributes());
@@ -368,12 +392,13 @@ class QueryTest extends TestCase {
         $this->assertArrayNotHasKey('username', $user->getAttributes());
     }
 
-    public function testDropValues() {
+    public function testDropValues()
+    {
         $user = User::create([
             'firstname' => 'Max7',
             'lastname' => 'Mustermann',
             'username1' => 'foobar',
-            'username2' => 'foobar2'
+            'username2' => 'foobar2',
         ]);
         $this->assertEquals('Max7', $user->firstname);
         $this->assertArrayHasKey('username1', $user->getAttributes());
@@ -397,5 +422,4 @@ class QueryTest extends TestCase {
         $this->assertArrayNotHasKey('username1', $user->getAttributes());
         $this->assertArrayNotHasKey('username2', $user->getAttributes());
     }
-
 }

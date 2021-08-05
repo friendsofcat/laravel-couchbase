@@ -1,19 +1,20 @@
-<?php 
+<?php
 
 namespace FriendsOfCat\Couchbase\Relations;
 
+use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasOne as EloquentHasOne;
-use Illuminate\Support\Arr;
 
-class HasOne extends EloquentHasOne {
-
+class HasOne extends EloquentHasOne
+{
     /**
      * Set the base constraints on the relation query.
      *
      * @return void
      */
-    public function addConstraints() {
+    public function addConstraints()
+    {
         if (static::$constraints) {
             if ($this->foreignKey === '_id') {
                 $this->query->useKeys(is_array($this->getParentKey()) ? $this->getParentKey() : [$this->getParentKey()]);
@@ -29,12 +30,14 @@ class HasOne extends EloquentHasOne {
      * @param array $models
      * @return void
      */
-    public function addEagerConstraints(array $models) {
+    public function addEagerConstraints(array $models)
+    {
         if ($this->foreignKey === '_id') {
             $this->query->useKeys(Arr::flatten($this->getKeys($models, $this->localKey)));
         } else {
             $this->query->whereIn(
-                $this->foreignKey, $this->getKeys($models, $this->localKey)
+                $this->foreignKey,
+                $this->getKeys($models, $this->localKey)
             );
         }
     }
@@ -44,7 +47,8 @@ class HasOne extends EloquentHasOne {
      *
      * @return string
      */
-    public function getHasCompareKey() {
+    public function getHasCompareKey()
+    {
         return $this->getForeignKeyName();
     }
 
@@ -56,7 +60,8 @@ class HasOne extends EloquentHasOne {
      * @param array|mixed $columns
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationQuery(Builder $query, Builder $parent, $columns = ['*']) {
+    public function getRelationQuery(Builder $query, Builder $parent, $columns = ['*'])
+    {
         $query->select($columns);
 
         $key = $this->wrap($this->getQualifiedParentKeyName());
@@ -67,7 +72,8 @@ class HasOne extends EloquentHasOne {
     /**
      * @inheritdoc
      */
-    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*']) {
+    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
+    {
         $foreignKey = $this->getForeignKeyName();
 
         return $query->select($foreignKey);
@@ -78,7 +84,8 @@ class HasOne extends EloquentHasOne {
      *
      * @return string
      */
-    public function getForeignKeyName() {
+    public function getForeignKeyName()
+    {
         return $this->foreignKey;
     }
 
@@ -87,7 +94,8 @@ class HasOne extends EloquentHasOne {
      *
      * @return string
      */
-    public function getPlainForeignKey() {
+    public function getPlainForeignKey()
+    {
         return $this->getForeignKey();
     }
 }

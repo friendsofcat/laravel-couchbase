@@ -1,67 +1,48 @@
 <?php
 
 namespace Tests;
+
 use Illuminate\Support\Facades\DB;
 
-class ConnectionTest extends TestCase {
-    public function testConnection() {
+class ConnectionTest extends TestCase
+{
+    public function testConnection()
+    {
         $connection = DB::connection('couchbase');
-        $this->assertInstanceOf('FriendsOfCat\Couchbase\Connection', $connection);
+        $this->assertInstanceOf(\FriendsOfCat\Couchbase\Connection::class, $connection);
     }
 
-    /**
-     * @group testReconnect
-     */
-    public function testReconnect() {
+    public function testReconnect()
+    {
         /** @var \FriendsOfCat\Couchbase\Connection $c1 */
         /** @var \FriendsOfCat\Couchbase\Connection $c2 */
         $c1 = DB::connection('couchbase');
-        $requiredReference = $c1->getCouchbaseCluster();
-        // $requiredReference is required because of spl_object_hash(): Once the object is destroyed, its hash may be reused for other objects.
-        $hash1 = spl_object_hash($c1->getCouchbaseCluster());
+        $hash1 = spl_object_hash($c1->getCluster());
         $c2 = DB::connection('couchbase');
-        $hash2 = spl_object_hash($c2->getCouchbaseCluster());
+        $hash2 = spl_object_hash($c2->getCluster());
         $this->assertEquals(spl_object_hash($c1), spl_object_hash($c2));
         $this->assertEquals($hash1, $hash2);
     }
 
-    /**
-     * @group testReconnect
-     */
-    public function testConnectionSingleton() {
+    public function testConnectionSingleton()
+    {
         /** @var \FriendsOfCat\Couchbase\Connection $c1 */
-        /** @var \FriendsOfCat\Couchbase\Connection $c2 */
-        $c1 = DB::connection();
-        $c2 = DB::connection('couchbase');
-        $this->assertEquals(spl_object_hash($c1), spl_object_hash($c2));
-        $this->assertEquals(spl_object_hash($c1->getCouchbaseCluster()), spl_object_hash($c2->getCouchbaseCluster()));
-
-        $c1 = DB::connection();
-        $c2 = DB::connection('couchbase');
-        $this->assertNotEquals(spl_object_hash($c1), spl_object_hash($c2));
-        $this->assertNotEquals(spl_object_hash($c1->getCouchbaseCluster()), spl_object_hash($c2->getCouchbaseCluster()));
-
         $c1 = DB::connection('couchbase');
+        /** @var \FriendsOfCat\Couchbase\Connection $c2 */
         $c2 = DB::connection('couchbase');
         $this->assertEquals(spl_object_hash($c1), spl_object_hash($c2));
-        $this->assertEquals(spl_object_hash($c1->getCouchbaseCluster()), spl_object_hash($c2->getCouchbaseCluster()));
+        $this->assertEquals(spl_object_hash($c1->getCluster()), spl_object_hash($c2->getCluster()));
     }
 
-    public function testDb() {
-        $connection = DB::connection();
-        $this->assertInstanceOf('CouchbaseBucket', $connection->getCouchbaseBucket());
-        $this->assertInstanceOf('CouchbaseCluster', $connection->getCouchbaseCluster());
-
+    public function testDb()
+    {
         $connection = DB::connection('couchbase');
-        $this->assertInstanceOf('CouchbaseBucket', $connection->getCouchbaseBucket());
-        $this->assertInstanceOf('CouchbaseCluster', $connection->getCouchbaseCluster());
-
-        $connection = DB::connection('couchbase');
-        $this->assertInstanceOf('CouchbaseBucket', $connection->getCouchbaseBucket());
-        $this->assertInstanceOf('CouchbaseCluster', $connection->getCouchbaseCluster());
+        $this->assertInstanceOf('Couchbase\Bucket', $connection->getBucket());
+        $this->assertInstanceOf('Couchbase\Cluster', $connection->getCluster());
     }
 
-    public function testBucketWithTypes() {
+    public function testBucketWithTypes()
+    {
         $connection = DB::connection();
         $this->assertInstanceOf('FriendsOfCat\Couchbase\Query\Builder', $connection->builder('unittests'));
         $this->assertInstanceOf('FriendsOfCat\Couchbase\Query\Builder', $connection->table('unittests'));
@@ -78,7 +59,8 @@ class ConnectionTest extends TestCase {
         $this->assertInstanceOf('FriendsOfCat\Couchbase\Query\Builder', $connection->type('unittests'));
     }
 
-    public function testQueryLog() {
+    public function testQueryLog()
+    {
         DB::enableQueryLog();
 
         $this->assertEquals(0, count(DB::getQueryLog()));
@@ -97,10 +79,10 @@ class ConnectionTest extends TestCase {
 
         DB::type('items')->insert(['name' => 'test']);
         $this->assertEquals(4, count(DB::getQueryLog())); // insert does not use N1QL-queries
-
     }
 
-    public function testDriverName() {
+    public function testDriverName()
+    {
         $driver = DB::connection()->getDriverName();
         $this->assertEquals('couchbase', $driver);
 

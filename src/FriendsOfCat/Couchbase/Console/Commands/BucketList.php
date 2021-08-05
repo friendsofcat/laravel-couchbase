@@ -2,39 +2,44 @@
 
 namespace FriendsOfCat\Couchbase\Console\Commands;
 
-use Symfony\Component\Process\Process;
+use Illuminate\Support\Facades\DB;
+use FriendsOfCat\Couchbase\Connection;
 
 class BucketList extends Command
 {
-  /**
-   * The name and signature of the console command.
-   *
-   * @var string
-   */
-  protected $signature = 'couchbase:bucket:list {--username=} {--password=} {--host=}';
-  
-  /**
-   * The console command description.
-   *
-   * @var string
-   */
-  protected $description = 'List available buckets on cluster';
-  
-  public function handle () {
-    $config = config('database.connections.couchbase');
-    $host = $this->option('host') ?? $config['host'];
-    $username = $this->option('username') ?? $config['username'];
-    $password = $this->option('password') ?? $config['password'];
-    
-    $process = Process::fromShellCommandline(sprintf('couchbase-cli bucket-list -u %s -p %s -c %s',
-      $username, $password, $host));
-    $process->setTimeout(null);
-    
-    $process->run(function ($type, $buffer) {
-      $this->displayOutput($buffer);
-    });
-    
-    $this->displayErrors($process);
-    
-  }
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'couchbase:bucket:list';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'List available buckets on cluster';
+
+    public function handle()
+    {
+        /** @var Connection $couchbase */
+        $couchbase = DB::connection('couchbase');
+        $buckets = $couchbase->listBuckets();
+
+        if (count($buckets) == 0) {
+            $this->comment('No bucket found.');
+
+            return self::SUCCESS;
+        }
+
+        foreach ($buckets as $bucket) {
+            $this->info(sprintf(
+                'Bucket: %s, flush enabled: %s, ram: %sMB',
+                $bucket->name(),
+                $bucket->flushEnabled() ? 'yes' : 'no',
+                $bucket->ramQuotaMb()
+            ));
+        }
+    }
 }

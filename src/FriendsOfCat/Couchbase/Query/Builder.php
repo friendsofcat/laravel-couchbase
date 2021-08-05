@@ -1,20 +1,20 @@
-<?php 
+<?php
 
 namespace FriendsOfCat\Couchbase\Query;
 
 use Couchbase\Exception;
+use Illuminate\Support\Arr;
+use FriendsOfCat\Couchbase\Helper;
+use Illuminate\Support\Collection;
+use FriendsOfCat\Couchbase\Connection;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Builder as BaseBuilder;
-use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Query\Grammars\Grammar as BaseGrammar;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use FriendsOfCat\Couchbase\Connection;
-use FriendsOfCat\Couchbase\Helper;
 
-class Builder extends BaseBuilder {
-
+class Builder extends BaseBuilder
+{
     /**
      * The column projections.
      *
@@ -152,18 +152,19 @@ class Builder extends BaseBuilder {
      * @param ConnectionInterface $connection
      * @param BaseGrammar $grammar
      * @param Processor $processor
-     * @return void
      * @throws \Exception
+     * @return void
      */
     public function __construct(
         ConnectionInterface $connection,
         BaseGrammar $grammar = null,
         Processor $processor = null
     ) {
-        if (!($connection instanceof Connection)) {
+        if (! ($connection instanceof Connection)) {
             throw new \Exception('Argument 1 passed to ' . get_class($this) . '::__construct() must be an instance of ' . Connection::class . ', instance of ' . get_class($connection) . ' given.');
         }
-        if (!($grammar === null || $grammar instanceof Grammar)) {
+
+        if (! ($grammar === null || $grammar instanceof Grammar)) {
             throw new \Exception('Argument 2 passed to ' . get_class($this) . '::__construct() must be an instance of ' . Grammar::class . ', instance of ' . get_class($grammar) . ' given.');
         }
 
@@ -175,13 +176,15 @@ class Builder extends BaseBuilder {
     /**
      * @param array|string $keys
      *
-     * @return $this
      * @throws Exception
+     * @return $this
      */
-    public function useKeys($keys) {
-        if (!empty($this->indexes)) {
+    public function useKeys($keys)
+    {
+        if (! empty($this->indexes)) {
             throw new Exception('Only one of useKeys or useIndex can be used, not both.');
         }
+
         if (is_null($keys)) {
             $keys = [];
         }
@@ -193,16 +196,17 @@ class Builder extends BaseBuilder {
     /**
      * @param string $name
      * @param string $type
-     * @return $this
      * @throws Exception
+     * @return $this
      */
-    public function useIndex($name, $type = Grammar::INDEX_TYPE_GSI) {
+    public function useIndex(string $name, string $type = Grammar::INDEX_TYPE_GSI)
+    {
         if ($this->keys !== null) {
             throw new Exception('Only one of useKeys or useIndex can be used, not both.');
         }
         $this->indexes[] = [
             'name' => $name,
-            'type' => $type
+            'type' => $type,
         ];
 
         return $this;
@@ -213,7 +217,8 @@ class Builder extends BaseBuilder {
      *
      * @return $this
      */
-    public function returning(array $column = ['*']) {
+    public function returning(array $column = ['*'])
+    {
         $this->returning = $column;
 
         return $this;
@@ -224,14 +229,19 @@ class Builder extends BaseBuilder {
      *
      * @return bool
      */
-    protected function shouldUseCollections() {
+    protected function shouldUseCollections()
+    {
         if (function_exists('app')) {
             $version = app()->version();
-            $version = filter_var(explode(')', $version)[0],
+            $version = filter_var(
+                explode(')', $version)[0],
                 FILTER_SANITIZE_NUMBER_FLOAT,
-                FILTER_FLAG_ALLOW_FRACTION); // lumen
+                FILTER_FLAG_ALLOW_FRACTION
+            ); // lumen
+
             return version_compare($version, '5.3', '>=');
         }
+
         return false;
     }
 
@@ -241,13 +251,15 @@ class Builder extends BaseBuilder {
      * @param string $type
      * @return $this
      */
-    public function from($table, $as = null) {
+    public function from($table, $as = null)
+    {
         $this->from = $this->connection->getBucketName();
         $this->type = $table;
 
-        if (!is_null($table)) {
+        if (! is_null($table)) {
             $this->where(Helper::TYPE_NAME, $table);
         }
+
         return $this;
     }
 
@@ -256,7 +268,8 @@ class Builder extends BaseBuilder {
      *
      * @return \Illuminate\Database\Query\Builder
      */
-    public function forNestedWhere() {
+    public function forNestedWhere()
+    {
         // ->from($this->from) is wrong, and ->from($this->type) is redundant in nested where
         return $this->newQuery()->from(null);
     }
@@ -267,7 +280,8 @@ class Builder extends BaseBuilder {
      * @param array $columns
      * @return $this
      */
-    public function project($columns) {
+    public function project($columns)
+    {
         $this->projections = is_array($columns) ? $columns : func_get_args();
 
         return $this;
@@ -279,7 +293,8 @@ class Builder extends BaseBuilder {
      * @param array $columns
      * @return \stdClass
      */
-    public function getWithMeta($columns = ['*']) {
+    public function getWithMeta($columns = ['*'])
+    {
         $original = $this->columns;
 
         if (is_null($original)) {
@@ -295,7 +310,9 @@ class Builder extends BaseBuilder {
         if (isset($results->rows)) {
             $results->rows = collect($results->rows);
         } else {
-            $results->rows = collect();
+            $reflection = new \ReflectionProperty($results, 'rows');
+            $reflection->setAccessible(true);
+            $reflection->setValue($results, collect());
         }
 
         return $results;
@@ -307,7 +324,8 @@ class Builder extends BaseBuilder {
      * @param int $seconds
      * @return $this
      */
-    public function timeout($seconds) {
+    public function timeout($seconds)
+    {
         $this->timeout = $seconds;
 
         return $this;
@@ -319,7 +337,8 @@ class Builder extends BaseBuilder {
      * @param mixed $index
      * @return $this
      */
-    public function hint($index) {
+    public function hint($index)
+    {
         $this->hint = $index;
 
         return $this;
@@ -332,10 +351,12 @@ class Builder extends BaseBuilder {
      * @param array $columns
      * @return mixed|static
      */
-    public function find($id, $columns = ['*']) {
+    public function find($id, $columns = ['*'])
+    {
         if (is_array($id) === true) {
             return $this->useKeys($id)->get($columns);
         }
+
         return $this->useKeys($id)->first($columns);
     }
 
@@ -344,7 +365,8 @@ class Builder extends BaseBuilder {
      *
      * @return string
      */
-    public function generateCacheKey() {
+    public function generateCacheKey()
+    {
         $key = [
             'bucket' => $this->from,
             'type' => $this->type,
@@ -367,15 +389,16 @@ class Builder extends BaseBuilder {
      * @param array $columns
      * @return mixed
      */
-    public function aggregate($function, $columns = ['*']) {
+    public function aggregate($function, $columns = ['*'])
+    {
         // added orders to ignore...
         $results = $this->cloneWithout(['orders', 'columns'])
             ->cloneWithoutBindings(['select'])
             ->setAggregate($function, $columns)
             ->get($columns);
 
-        if (!$results->isEmpty()) {
-            return array_change_key_case((array)$results[0])['aggregate'];
+        if (! $results->isEmpty()) {
+            return array_change_key_case((array) $results[0])['aggregate'];
         }
     }
 
@@ -384,8 +407,9 @@ class Builder extends BaseBuilder {
      *
      * @return bool
      */
-    public function exists() {
-        return !is_null($this->first([Grammar::VIRTUAL_META_ID_COLUMN]));
+    public function exists()
+    {
+        return ! is_null($this->first([Grammar::VIRTUAL_META_ID_COLUMN]));
     }
 
     /**
@@ -397,7 +421,8 @@ class Builder extends BaseBuilder {
      * @param bool $not
      * @return Builder
      */
-    public function whereBetween($column, array $values, $boolean = 'and', $not = false) {
+    public function whereBetween($column, array $values, $boolean = 'and', $not = false)
+    {
         $type = 'between';
 
         $this->wheres[] = compact('column', 'type', 'boolean', 'values', 'not');
@@ -407,17 +432,17 @@ class Builder extends BaseBuilder {
         return $this;
     }
 
-
     /**
      * Set the bindings on the query builder.
      *
      * @param array $bindings
      * @param string $type
+     * @throws \InvalidArgumentException
      * @return $this
      *
-     * @throws \InvalidArgumentException
      */
-    public function setBindings(array $bindings, $type = 'where') {
+    public function setBindings(array $bindings, $type = 'where')
+    {
         return parent::setBindings($bindings, $type);
     }
 
@@ -426,11 +451,12 @@ class Builder extends BaseBuilder {
      *
      * @param mixed $value
      * @param string $type
+     * @throws \InvalidArgumentException
      * @return $this
      *
-     * @throws \InvalidArgumentException
      */
-    public function addBinding($value, $type = 'where') {
+    public function addBinding($value, $type = 'where')
+    {
         return parent::addBinding($value, $type);
     }
 
@@ -441,7 +467,8 @@ class Builder extends BaseBuilder {
      * @param int $perPage
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function forPage($page, $perPage = 15) {
+    public function forPage($page, $perPage = 15)
+    {
         $this->paginating = true;
 
         return $this->skip(($page - 1) * $perPage)->take($perPage);
@@ -454,15 +481,18 @@ class Builder extends BaseBuilder {
      *
      * @return bool
      */
-    public function insert(array $values) {
+    public function insert(array $values)
+    {
         // Since every insert gets treated like a batch insert, we will have to detect
         // if the user is inserting a single document or an array of documents.
         $batch = true;
+
         foreach ($values as $key => $value) {
             // As soon as we find a value that is not an array we assume the user is
             // inserting a single document.
-            if (!is_array($value) || is_string($key)) {
+            if (! is_array($value) || is_string($key)) {
                 $batch = false;
+
                 break;
             }
         }
@@ -477,7 +507,7 @@ class Builder extends BaseBuilder {
                 $key = Helper::getUniqueId($this->type);
                 $result = $this
                     ->connection
-                    ->getCouchbaseBucket()
+                    ->getBucket()
                     ->defaultCollection()
                     ->upsert($key, Grammar::removeMissingValue($value));
             }
@@ -485,7 +515,7 @@ class Builder extends BaseBuilder {
             $values[Helper::TYPE_NAME] = $this->type;
             $result = $this
                 ->connection
-                ->getCouchbaseBucket()
+                ->getBucket()
                 ->defaultCollection()
                 ->upsert($this->keys, Grammar::removeMissingValue($values));
         }
@@ -499,11 +529,13 @@ class Builder extends BaseBuilder {
      * @param array $values
      * @return int
      */
-    public function update(array $values) {
+    public function update(array $values)
+    {
         // replace MissingValue in 2nd or deeper levels
         foreach ($values as $key => $value) {
             $values[$key] = Grammar::removeMissingValue($value);
         }
+
         return parent::update($values);
     }
 
@@ -514,13 +546,15 @@ class Builder extends BaseBuilder {
      * @param string $sequence
      * @return int
      */
-    public function insertGetId(array $values, $sequence = null) {
-        if (!is_null($sequence) && isset($values[$sequence])) {
-            $this->useKeys((string)$values[$sequence]);
+    public function insertGetId(array $values, $sequence = null)
+    {
+        if (! is_null($sequence) && isset($values[$sequence])) {
+            $this->useKeys((string) $values[$sequence]);
         } elseif (isset($values['_id'])) {
-            $this->useKeys((string)$values['_id']);
+            $this->useKeys((string) $values['_id']);
         }
         $this->insert($values);
+
         return $this->keys;
     }
 
@@ -531,25 +565,29 @@ class Builder extends BaseBuilder {
      * @param string|null $key
      * @return \Illuminate\Support\Collection
      */
-    public function pluck($column, $key = null) {
+    public function pluck($column, $key = null)
+    {
         $results = $this->get(is_null($key) ? [$column] : [$column, $key]);
 
         // Convert ObjectID's to strings
         if ($key == '_id') {
             $results = $results->map(function ($item) {
-                $item['_id'] = (string)$item['_id'];
+                $item['_id'] = (string) $item['_id'];
+
                 return $item;
             });
         }
 
         $p = Arr::pluck($results, $column, $key);
+
         return $this->useCollections ? new Collection($p) : $p;
     }
 
     /**
      * Run a truncate statement on the table.
      */
-    public function truncate() {
+    public function truncate()
+    {
         return $this->delete();
     }
 
@@ -561,7 +599,8 @@ class Builder extends BaseBuilder {
      * @return array
      * @deprecated
      */
-    public function lists($column, $key = null) {
+    public function lists($column, $key = null)
+    {
         return $this->pluck($column, $key);
     }
 
@@ -574,22 +613,27 @@ class Builder extends BaseBuilder {
      *
      * @return array|\Couchbase\Document
      */
-    public function push($column, $value = null, $unique = false) {
-        $obj = $this->connection->getCouchbaseBucket()->get($this->keys);
-        if (!isset($obj->value->{$column})) {
+    public function push($column, $value = null, $unique = false)
+    {
+        $obj = $this->connection->getBucket()->get($this->keys);
+
+        if (! isset($obj->value->{$column})) {
             $obj->value->{$column} = [];
         }
+
         if (is_array($value) && count($value) === 1) {
             $obj->value->{$column}[] = reset($value);
         } else {
             $obj->value->{$column}[] = $value;
         }
+
         if ($unique) {
             $array = array_map('json_encode', $obj->value->{$column});
             $array = array_unique($array);
             $obj->value->{$column} = array_map('json_decode', $array);
         }
-        return $this->connection->getCouchbaseBucket()->upsert($this->keys, $obj->value);
+
+        return $this->connection->getBucket()->upsert($this->keys, $obj->value);
     }
 
     /**
@@ -598,31 +642,41 @@ class Builder extends BaseBuilder {
      * @param mixed $column
      * @param mixed $value
      *
-     * @return array|\Couchbase\Document|null
      * @throws Exception
+     * @return array|\Couchbase\Document|null
      */
-    public function pull($column, $value = null) {
+    public function pull($column, $value = null)
+    {
         try {
-            $obj = $this->connection->getCouchbaseBucket()->get($this->keys);
+            $obj = $this->connection->getBucket()->get($this->keys);
         } catch (Exception $e) {
             if ($e->getCode() === COUCHBASE_KEY_ENOENT) {
-                trigger_error('Tying to pull a value from non existing document ' . json_encode($this->keys) . '.',
-                    E_USER_WARNING);
+                trigger_error(
+                    'Tying to pull a value from non existing document ' . json_encode($this->keys) . '.',
+                    E_USER_WARNING
+                );
+
                 return null;
             }
+
             throw $e;
         }
 
-        if (!is_array($value)) {
+        if (! is_array($value)) {
             $value = [$value];
         }
-        if (!isset($obj->value->{$column})) {
-            trigger_error('Tying to pull a value from non existing column ' . json_encode($column) . ' in document ' . json_encode($this->keys) . '.',
-                E_USER_WARNING);
+
+        if (! isset($obj->value->{$column})) {
+            trigger_error(
+                'Tying to pull a value from non existing column ' . json_encode($column) . ' in document ' . json_encode($this->keys) . '.',
+                E_USER_WARNING
+            );
+
             return null;
         }
         $filtered = collect($obj->value->{$column})->reject(function ($val, $key) use ($value) {
             $match = false;
+
             if (is_object($val)) {
                 foreach ($value as $matchKey => $matchValue) {
                     if ($val->{$matchKey} === $value[$matchKey]) {
@@ -637,7 +691,7 @@ class Builder extends BaseBuilder {
         });
         $obj->value->{$column} = $filtered->flatten()->toArray();
 
-        return $this->connection->getCouchbaseBucket()->upsert($this->keys, $obj->value);
+        return $this->connection->getBucket()->upsert($this->keys, $obj->value);
     }
 
     /**
@@ -646,11 +700,14 @@ class Builder extends BaseBuilder {
      * @param array $bindings
      * @return array
      */
-    public function cleanBindings(array $bindings): array {
-        return array_values(array_filter(parent::cleanBindings($bindings),
+    public function cleanBindings(array $bindings): array
+    {
+        return array_values(array_filter(
+            parent::cleanBindings($bindings),
             function ($binding) {
-                return !($binding instanceof MissingValue);
-            }));
+                return ! ($binding instanceof MissingValue);
+            }
+        ));
     }
 
     /**
@@ -659,20 +716,23 @@ class Builder extends BaseBuilder {
      * @param mixed $columns
      * @return int
      */
-    public function drop($columns) {
-        if (!is_array($columns)) {
+    public function drop($columns)
+    {
+        if (! is_array($columns)) {
             $columns = [$columns];
         }
 
         $query = $this->getGrammar()->compileUnset($this, $columns);
         $bindings = $this->getBindings();
+
         return $this->connection->update($query, $bindings);
     }
 
     /**
      * @return Grammar
      */
-    public function getGrammar(): Grammar {
+    public function getGrammar(): Grammar
+    {
         return parent::getGrammar();
     }
 
@@ -681,7 +741,8 @@ class Builder extends BaseBuilder {
      *
      * @return Builder
      */
-    public function newQuery() {
+    public function newQuery()
+    {
         return new Builder($this->connection, $this->grammar, $this->processor);
     }
 
@@ -690,11 +751,12 @@ class Builder extends BaseBuilder {
      *
      * @return \stdClass
      */
-    protected function runSelectWithMeta() {
+    protected function runSelectWithMeta()
+    {
         return $this->connection->selectWithMeta(
             $this->toSql(),
             $this->getBindings(),
-            !$this->useWritePdo
+            ! $this->useWritePdo
         );
     }
 
@@ -704,7 +766,8 @@ class Builder extends BaseBuilder {
      * @param mixed $id
      * @return mixed
      */
-    public function convertKey($id) {
+    public function convertKey($id)
+    {
         return $id;
     }
 
@@ -715,11 +778,12 @@ class Builder extends BaseBuilder {
      * @param mixed $value
      * @param string $alias
      * @param array $values
+     * @throws \InvalidArgumentException
      * @return \Illuminate\Database\Query\Builder|static
      *
-     * @throws \InvalidArgumentException
      */
-    public function forIn($column, $value, $alias, $values) {
+    public function forIn($column, $value, $alias, $values)
+    {
         $this->forIns[] = compact('column', 'value', 'alias', 'values');
 
         return $this;
@@ -732,14 +796,16 @@ class Builder extends BaseBuilder {
      * @param string $operator
      * @param mixed $value
      * @param string $boolean
+     * @throws \InvalidArgumentException
      * @return \Illuminate\Database\Query\Builder|static
      *
-     * @throws \InvalidArgumentException
      */
-    public function where($column, $operator = null, $value = null, $boolean = 'and') {
+    public function where($column, $operator = null, $value = null, $boolean = 'and')
+    {
         if ($column === '_id') {
             $column = $this->grammar->getMetaIdExpression($this);
         }
+
         return parent::where($column, $operator, $value, $boolean);
     }
 
@@ -751,10 +817,11 @@ class Builder extends BaseBuilder {
      * @param string $boolean
      * @return $this
      */
-    public function whereRaw($sql, $bindings = [], $boolean = 'and') {
+    public function whereRaw($sql, $bindings = [], $boolean = 'and')
+    {
         $this->wheres[] = ['type' => 'raw', 'sql' => $sql, 'boolean' => $boolean, 'bindings' => $bindings];
 
-        $this->addBinding((array)$bindings, 'where');
+        $this->addBinding((array) $bindings, 'where');
 
         return $this;
     }
@@ -767,7 +834,8 @@ class Builder extends BaseBuilder {
      * @param bool $not
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function whereNull($column, $boolean = 'and', $not = false) {
+    public function whereNull($column, $boolean = 'and', $not = false)
+    {
         if ($column === '_id') {
             if ($not) {
                 // the meta().id of a document is never null
@@ -776,6 +844,7 @@ class Builder extends BaseBuilder {
             }
             $column = $this->grammar->getMetaIdExpression($this);
         }
+
         return parent::whereNull($column, $boolean, $not);
     }
 
@@ -787,7 +856,8 @@ class Builder extends BaseBuilder {
      * @param string $boolean
      * @return $this
      */
-    public function whereAnyIn($column, $values, $boolean = 'and') {
+    public function whereAnyIn($column, $values, $boolean = 'and')
+    {
         $type = 'AnyIn';
 
         if ($values instanceof Arrayable) {
@@ -797,7 +867,7 @@ class Builder extends BaseBuilder {
         $this->wheres[] = compact('type', 'column', 'values', 'boolean');
 
         foreach ($values as $value) {
-            if (!$value instanceof Expression) {
+            if (! $value instanceof Expression) {
                 $this->addBinding($value, 'where');
             }
         }
@@ -811,7 +881,8 @@ class Builder extends BaseBuilder {
      * @param array $options
      * @return $this
      */
-    public function options(array $options) {
+    public function options(array $options)
+    {
         $this->options = $options;
 
         return $this;
@@ -822,10 +893,12 @@ class Builder extends BaseBuilder {
      *
      * @return array
      */
-    protected function detectValues($values) {
+    protected function detectValues($values)
+    {
         foreach ($values as &$value) {
             $value[Helper::TYPE_NAME] = $this->type;
         }
+
         return [$values];
     }
 
@@ -836,7 +909,8 @@ class Builder extends BaseBuilder {
      * @param array $parameters
      * @return mixed
      */
-    public function __call($method, $parameters) {
+    public function __call($method, $parameters)
+    {
         if ($method == 'unset') {
             return call_user_func_array([$this, 'drop'], $parameters);
         }

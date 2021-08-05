@@ -1,18 +1,19 @@
 <?php
 
-
 namespace FriendsOfCat\Couchbase\Schema;
 
 use Closure;
 use FriendsOfCat\Couchbase\Connection;
 
-class Builder extends \Illuminate\Database\Schema\Builder {
+class Builder extends \Illuminate\Database\Schema\Builder
+{
     /**
      * Create a new database Schema manager.
      *
      * @param Connection $connection
      */
-    public function __construct(Connection $connection) {
+    public function __construct(Connection $connection)
+    {
         $this->connection = $connection;
         $this->grammar = $connection->getSchemaGrammar();
     }
@@ -24,7 +25,8 @@ class Builder extends \Illuminate\Database\Schema\Builder {
      * @param string $column
      * @return bool
      */
-    public function hasColumn($table, $column) {
+    public function hasColumn($table, $column)
+    {
         return true;
     }
 
@@ -35,7 +37,8 @@ class Builder extends \Illuminate\Database\Schema\Builder {
      * @param array $columns
      * @return bool
      */
-    public function hasColumns($table, array $columns) {
+    public function hasColumns($table, array $columns)
+    {
         return true;
     }
 
@@ -45,7 +48,8 @@ class Builder extends \Illuminate\Database\Schema\Builder {
      * @param string $collection
      * @return bool
      */
-    public function hasTable($collection) {
+    public function hasTable($collection)
+    {
         return true;
     }
 
@@ -56,7 +60,8 @@ class Builder extends \Illuminate\Database\Schema\Builder {
      * @param Closure $callback
      * @return bool
      */
-    public function table($collection, Closure $callback) {
+    public function table($collection, Closure $callback)
+    {
         return true;
     }
 
@@ -67,7 +72,8 @@ class Builder extends \Illuminate\Database\Schema\Builder {
      * @param Closure $callback
      * @return bool
      */
-    public function create($collection, Closure $callback = null) {
+    public function create($collection, Closure $callback = null)
+    {
         return true;
     }
 
@@ -77,7 +83,8 @@ class Builder extends \Illuminate\Database\Schema\Builder {
      * @param string $collection
      * @return bool
      */
-    public function drop($collection) {
+    public function drop($collection)
+    {
         return true;
     }
 
@@ -87,7 +94,8 @@ class Builder extends \Illuminate\Database\Schema\Builder {
      * @param string $collection
      * @return Blueprint
      */
-    protected function createBlueprint($collection, Closure $callback = null) {
+    protected function createBlueprint($collection, Closure $callback = null)
+    {
         return new Blueprint($collection, $callback);
     }
 }

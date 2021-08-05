@@ -2,14 +2,15 @@
 
 namespace Tests;
 
-use Illuminate\Support\Facades\Validator;
 use Tests\Models\User;
+use Illuminate\Support\Facades\Validator;
 
-class ValidationTest extends TestCase {
-  
-  use RefreshDatabase;
+class ValidationTest extends TestCase
+{
+    use RefreshDatabase;
 
-    public function testUnique() {
+    public function testUnique()
+    {
         $validator = Validator::make(
             ['name' => 'John Doe'],
             ['name' => 'required|unique:couchbase.users']

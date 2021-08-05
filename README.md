@@ -3,6 +3,12 @@ Laravel Couchbase
 
 An Eloquent model and Query builder with support for Couchbase, using the original Laravel API. *This library extends the original Laravel classes, so it uses exactly the same methods.*
 
+## Credits
+- Created from previous work of 
+  * [Huong-Da-Online/laravel-couchbase](https://github.com/Huong-Da-Online/laravel-couchbase)
+  * [ORT-Interactive-GmbH/laravel-couchbase](https://github.com/ORT-Interactive-GmbH/laravel-couchbase)
+- [SDK references](https://docs.couchbase.com/sdk-api/couchbase-php-client/namespaces/couchbase.html)
+
 Table of contents
 -----------------
 * [Installation](#installation)
@@ -649,3 +655,17 @@ DB::connection()->disableQueryLog();
 ```
 
 *From: http://laravel.com/docs/database#query-logging*
+
+## Testing
+- Create bucket
+- Create bucket primary index
+- Run tests
+- Use `RefreshDatabase` trait to clear database between tests
+
+
+## TODO
+This is not a fully featured eloquent driver. There are still some areas where attention would be needed. Just to name few:
+- [ ] Implement _table_ concept using [collection/scope](https://docs.couchbase.com/sdk-api/couchbase-php-client/classes/Couchbase-CollectionManager.html) instead of `type`. This could improve performance
+- [ ] Test commands
+- [ ] Test pagination
+- [ ] Helper `uniqueId`

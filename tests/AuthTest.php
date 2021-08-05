@@ -1,14 +1,17 @@
 <?php
 
-
 namespace Tests;
+
+use Tests\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Tests\Models\User;
 
-class AuthTest extends TestCase {
+class AuthTest extends TestCase
+{
+    use RefreshDatabase;
 
-    public function testAuthAttempt() {
+    public function testAuthAttempt()
+    {
         $user = User::create([
             'name' => 'John Doe',
             'email' => 'john@doe.com',
@@ -17,5 +20,6 @@ class AuthTest extends TestCase {
 
         $this->assertTrue(Auth::attempt(['email' => 'john@doe.com', 'password' => 'foobar'], true));
         $this->assertTrue(Auth::check());
+        $this->assertEquals($user->_id, Auth::user()->_id);
     }
 }

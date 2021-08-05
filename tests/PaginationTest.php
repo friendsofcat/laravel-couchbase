@@ -1,43 +1,37 @@
 <?php
 
 namespace Tests;
-class PaginationTest extends TestCase {
-    public function tearDown() {
-        User::truncate();
-        parent::tearDown();
-    }
 
-    /**
-     * @group PaginationTest
-     */
-    public function testAll() {
-        DB::connection('couchbase-not-default')->table('users')->delete();
+use Tests\Models\User;
 
-        DB::connection('couchbase-not-default')->table('users')->insert(['name' => 'John Doe 1', 'abc' => 1]);
-        DB::connection('couchbase-not-default')->table('users')->insert(['name' => 'John Doe 2', 'abc' => 1]);
-        DB::connection('couchbase-not-default')->table('users')->insert(['name' => 'John Doe 3', 'abc' => 2]);
-        DB::connection('couchbase-not-default')->table('users')->insert(['name' => 'John Doe 4', 'abc' => 2]);
-        DB::connection('couchbase-not-default')->table('users')->insert(['name' => 'John Doe 5', 'abc' => 2]);
-        DB::connection('couchbase-not-default')->table('users')->insert(['name' => 'John Doe 6', 'abc' => 2]);
+class PaginationTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function testAll()
+    {
+        User::create(['name' => 'John Doe 1', 'abc' => 1]);
+        User::create(['name' => 'John Doe 2', 'abc' => 1]);
+        User::create(['name' => 'John Doe 3', 'abc' => 2]);
+        User::create(['name' => 'John Doe 4', 'abc' => 2]);
+        User::create(['name' => 'John Doe 5', 'abc' => 2]);
+        User::create(['name' => 'John Doe 6', 'abc' => 2]);
 
         /** @var \Illuminate\Pagination\LengthAwarePaginator $pagination */
         $pagination = User::paginate(2);
+        dd($pagination, User::count(), User::all());
         $this->assertEquals(2, $pagination->count());
         $this->assertEquals(6, $pagination->total());
     }
 
-    /**
-     * @group PaginationTest
-     */
-    public function testWhere() {
-        DB::connection('couchbase-not-default')->table('users')->delete();
-
-        DB::connection('couchbase-not-default')->table('users')->insert(['name' => 'John Doe 1', 'abc' => 1]);
-        DB::connection('couchbase-not-default')->table('users')->insert(['name' => 'John Doe 2', 'abc' => 1]);
-        DB::connection('couchbase-not-default')->table('users')->insert(['name' => 'John Doe 3', 'abc' => 2]);
-        DB::connection('couchbase-not-default')->table('users')->insert(['name' => 'John Doe 4', 'abc' => 2]);
-        DB::connection('couchbase-not-default')->table('users')->insert(['name' => 'John Doe 5', 'abc' => 2]);
-        DB::connection('couchbase-not-default')->table('users')->insert(['name' => 'John Doe 6', 'abc' => 2]);
+    public function testWhere()
+    {
+        $this->getCouchbaseConnection()->table('users')->insert(['name' => 'John Doe 1', 'abc' => 1]);
+        $this->getCouchbaseConnection()->table('users')->insert(['name' => 'John Doe 2', 'abc' => 1]);
+        $this->getCouchbaseConnection()->table('users')->insert(['name' => 'John Doe 3', 'abc' => 2]);
+        $this->getCouchbaseConnection()->table('users')->insert(['name' => 'John Doe 4', 'abc' => 2]);
+        $this->getCouchbaseConnection()->table('users')->insert(['name' => 'John Doe 5', 'abc' => 2]);
+        $this->getCouchbaseConnection()->table('users')->insert(['name' => 'John Doe 6', 'abc' => 2]);
 
         /** @var \Illuminate\Pagination\LengthAwarePaginator $pagination */
         $pagination = User::where('abc', 2)->paginate(2);
@@ -45,18 +39,14 @@ class PaginationTest extends TestCase {
         $this->assertEquals(4, $pagination->total());
     }
 
-    /**
-     * @group PaginationTest
-     */
-    public function testOrderBy() {
-        DB::connection('couchbase-not-default')->table('users')->delete();
-
-        DB::connection('couchbase-not-default')->table('users')->insert(['name' => 'John Doe 1', 'abc' => 1]);
-        DB::connection('couchbase-not-default')->table('users')->insert(['name' => 'John Doe 2', 'abc' => 1]);
-        DB::connection('couchbase-not-default')->table('users')->insert(['name' => 'John Doe 3', 'abc' => 2]);
-        DB::connection('couchbase-not-default')->table('users')->insert(['name' => 'John Doe 4', 'abc' => 2]);
-        DB::connection('couchbase-not-default')->table('users')->insert(['name' => 'John Doe 5', 'abc' => 2]);
-        DB::connection('couchbase-not-default')->table('users')->insert(['name' => 'John Doe 6', 'abc' => 2]);
+    public function testOrderBy()
+    {
+        $this->getCouchbaseConnection()->table('users')->insert(['name' => 'John Doe 1', 'abc' => 1]);
+        $this->getCouchbaseConnection()->table('users')->insert(['name' => 'John Doe 2', 'abc' => 1]);
+        $this->getCouchbaseConnection()->table('users')->insert(['name' => 'John Doe 3', 'abc' => 2]);
+        $this->getCouchbaseConnection()->table('users')->insert(['name' => 'John Doe 4', 'abc' => 2]);
+        $this->getCouchbaseConnection()->table('users')->insert(['name' => 'John Doe 5', 'abc' => 2]);
+        $this->getCouchbaseConnection()->table('users')->insert(['name' => 'John Doe 6', 'abc' => 2]);
 
         /** @var \Illuminate\Pagination\LengthAwarePaginator $pagination */
         $pagination = User::where('abc', 2)->orderBy('name', 'ASC')->paginate(2);

@@ -1,20 +1,21 @@
-<?php 
+<?php
 
 namespace FriendsOfCat\Couchbase\Relations;
 
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\HasMany as EloquentHasMany;
 use Illuminate\Support\Arr;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\HasMany as EloquentHasMany;
 
-class HasMany extends EloquentHasMany {
-
+class HasMany extends EloquentHasMany
+{
     /**
      * Set the base constraints on the relation query.
      *
      * @return void
      */
-    public function addConstraints() {
+    public function addConstraints()
+    {
         if (static::$constraints) {
             if ($this->foreignKey === '_id') {
                 $this->query->useKeys(is_array($this->getParentKey()) ? $this->getParentKey() : [$this->getParentKey()]);
@@ -30,21 +31,25 @@ class HasMany extends EloquentHasMany {
      * @param array $models
      * @return void
      */
-    public function addEagerConstraints(array $models) {
+    public function addEagerConstraints(array $models)
+    {
         if ($this->foreignKey === '_id') {
             $this->query->useKeys(Arr::flatten($this->getKeys($models, $this->localKey)));
         } else {
             $this->query->whereIn(
-                $this->foreignKey, $this->getKeys($models, $this->localKey)
+                $this->foreignKey,
+                $this->getKeys($models, $this->localKey)
             );
         }
     }
 
-    public function getForeignKeyName() {
+    public function getForeignKeyName()
+    {
         return $this->foreignKey;
     }
 
-    public function getPlainForeignKey() {
+    public function getPlainForeignKey()
+    {
         return $this->getForeignKeyName();
     }
 
@@ -53,14 +58,16 @@ class HasMany extends EloquentHasMany {
      *
      * @return string
      */
-    public function getHasCompareKey() {
+    public function getHasCompareKey()
+    {
         return $this->getForeignKeyName();
     }
 
     /**
      * @inheritdoc
      */
-    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*']) {
+    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
+    {
         $foreignKey = $this->getHasCompareKey();
 
         return $query->select($foreignKey);
@@ -74,7 +81,8 @@ class HasMany extends EloquentHasMany {
      * @param array|mixed $columns
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationQuery(Builder $query, Builder $parent, $columns = ['*']) {
+    public function getRelationQuery(Builder $query, Builder $parent, $columns = ['*'])
+    {
         $query->select($columns);
 
         $key = $this->wrap($this->getQualifiedParentKeyName());
@@ -89,7 +97,8 @@ class HasMany extends EloquentHasMany {
      * @param string $type
      * @return array
      */
-    protected function matchOneOrMany(array $models, Collection $results, $relation, $type) {
+    protected function matchOneOrMany(array $models, Collection $results, $relation, $type)
+    {
         $dictionary = $this->buildDictionary($results);
 
         // Once we have the dictionary we can simply spin through the parent models to
@@ -97,14 +106,18 @@ class HasMany extends EloquentHasMany {
         // matching very convenient and easy work. Then we'll just return them.
         foreach ($models as $model) {
             $keys = $model->getAttribute($this->localKey);
+
             if (is_array($keys)) {
                 $result = collect();
+
                 foreach ($keys as $key) {
                     if (isset($dictionary[$key])) {
-                        if (!is_array($dictionary[$key])) {
+                        if (! is_array($dictionary[$key])) {
                             $result[] = $dictionary[$key];
+
                             continue;
                         }
+
                         foreach ($dictionary[$key] as $object) {
                             $result[] = $object;
                         }
@@ -113,12 +126,12 @@ class HasMany extends EloquentHasMany {
                 $model->setRelation($relation, $result);
             } elseif (isset($dictionary[$keys])) {
                 $model->setRelation(
-                    $relation, $this->getRelationValue($dictionary, $keys, $type)
+                    $relation,
+                    $this->getRelationValue($dictionary, $keys, $type)
                 );
             }
         }
 
         return $models;
     }
-
 }

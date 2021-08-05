@@ -22,7 +22,7 @@
     },
     "autoload": {
         "psr-4": {
-            "FriendsOfCat\\Couchbase\\": "src/FriendsOfCat/Couchbase/"
+            "FriendsOfCat\\": "src/FriendsOfCat/"
         }
     },
     "autoload-dev": {

@@ -6,19 +6,19 @@ use Symfony\Component\Process\Process;
 
 class Command extends \Illuminate\Console\Command
 {
-  protected function displayErrors(Process $process)
-  {
-    if (! $process->isSuccessful()) {
-      $process->run(function ($type, $buffer) {
-        $this->displayOutput($buffer);
-      });
-      
-      // $this->displayErrors($process);
+    protected function displayErrors(Process $process)
+    {
+        if (! $process->isSuccessful()) {
+            $process->run(function ($type, $buffer) {
+                $this->displayOutput($buffer);
+            });
+
+            // $this->displayErrors($process);
+        }
     }
-  }
-  
-  protected function displayOutput($buffer)
-  {
-    $this->comment($buffer);
-  }
+
+    protected function displayOutput($buffer)
+    {
+        $this->comment($buffer);
+    }
 }

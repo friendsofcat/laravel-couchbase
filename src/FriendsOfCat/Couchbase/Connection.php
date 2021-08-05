@@ -7,6 +7,10 @@ namespace FriendsOfCat\Couchbase;
 use Couchbase\Bucket;
 use Couchbase\Cluster;
 use Couchbase\N1qlQuery;
+use Couchbase\BucketManager;
+use Couchbase\BucketSettings;
+use Couchbase\QueryIndexManager;
+use Couchbase\CreateQueryPrimaryIndexOptions;
 use FriendsOfCat\Couchbase\Events\QueryFired;
 use FriendsOfCat\Couchbase\Query\Builder as QueryBuilder;
 use FriendsOfCat\Couchbase\Query\Grammar as QueryGrammar;
@@ -93,6 +97,11 @@ class Connection extends \Illuminate\Database\Connection
         return $this->bucketname;
     }
 
+    public function getCluster(): Cluster
+    {
+        return $this->cluster;
+    }
+
     /**
      * Begin a fluent query against a set of document types.
      *
@@ -129,8 +138,10 @@ class Connection extends \Illuminate\Database\Connection
                 return true;
             }
             $result = $this->runN1qlQuery($query, $bindings);
+            $reflectionProperty = new \ReflectionProperty($result, 'status');
+            $reflectionProperty->setAccessible(true);
 
-            return $result->status === 'success';
+            return $reflectionProperty->getValue($result) === 'success';
         });
     }
 
@@ -311,8 +322,12 @@ class Connection extends \Illuminate\Database\Connection
      *
      * @return Bucket
      */
-    public function getCouchbaseBucket()
+    public function getBucket(): Bucket
     {
+        if (! isset($this->bucket)) {
+            $this->bucket = $this->cluster->bucket($this->bucketname);
+        }
+
         return $this->bucket;
     }
 
@@ -324,16 +339,6 @@ class Connection extends \Illuminate\Database\Connection
     public function getQueryGrammar(): QueryGrammar
     {
         return $this->queryGrammar;
-    }
-
-    /**
-     * return CouchbaseCluster object.
-     *
-     * @return Cluster
-     */
-    public function getCouchbaseCluster()
-    {
-        return $this->cluster;
     }
 
     /**
@@ -350,7 +355,6 @@ class Connection extends \Illuminate\Database\Connection
         $options->credentials($this->config['username'], $this->config['password']);
         $cluster = new \Couchbase\Cluster($connectionString, $options);
         $this->cluster = $cluster;
-        $this->bucket = $cluster->bucket($this->bucketname);
 
         return $cluster;
     }
@@ -401,7 +405,7 @@ class Connection extends \Illuminate\Database\Connection
     }
 
     /**
-     * Get the PDO driver name.
+     * Get the driver name.
      *
      * @return string
      */
@@ -430,8 +434,47 @@ class Connection extends \Illuminate\Database\Connection
         return new Query\Grammar();
     }
 
+    public function flushBucket($bucketName = null)
+    {
+        $bucketName = $bucketName ?? $this->getBucketName();
+        $this->getBucketManager()->flush($bucketName);
+    }
+
+    public function getBucketManager(): BucketManager
+    {
+        return $this->getCluster()->buckets();
+    }
+
+    public function createBucket(BucketSettings $settings)
+    {
+        return $this->getBucketManager()->createBucket($settings);
+    }
+
+    public function removeBucket(string $name)
+    {
+        $this->getBucketManager()->removeBucket($name);
+    }
+
+    /**
+     * @return BucketSettings[]
+     */
+    public function listBuckets(): array
+    {
+        return $this->getBucketManager()->getAllBuckets();
+    }
+
+    public function createPrimaryIndex(string $bucket)
+    {
+        // API from the SDK not working so running the query directly.
+        // $manager = new QueryIndexManager();
+        // $manager->createPrimaryIndex($bucket,
+        //   (new CreateQueryPrimaryIndexOptions())->ignoreIfExists(true)
+        // );
+        return $this->runN1qlQuery(sprintf('create primary index on %s', $bucket), []);
+    }
+
     public function __call($method, $parameters)
     {
-        return call_user_func_array([$this, $method], $parameters);
+        return call_user_func_array([$this->cluster, $method], $parameters);
     }
 }

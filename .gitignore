@@ -10,3 +10,4 @@ composer.lock
 .env
 .php-cs-fixer.cache
 sql-log.sql
+.phpunit.result.cache

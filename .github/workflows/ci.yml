@@ -44,7 +44,7 @@ jobs:
           fail-fast: true
 
       - name: Check couchbase PHP extension
-          run: |
+        run: |
             php -m
             php -r "if(! extension_loaded('couchbase')) {throw new Exception('couchbase not found');}"
 

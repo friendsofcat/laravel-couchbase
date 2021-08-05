@@ -28,4 +28,4 @@ jobs:
         run: php-cs-fixer --version
 
       - name: Check Coding Standards
-        run: php-cs-fixer fix --dry-run --config .php-cs-fixer.php
+        run: composer check-style

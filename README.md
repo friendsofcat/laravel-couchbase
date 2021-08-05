@@ -100,6 +100,16 @@ class User extends Eloquent {
 ```
 More on that on [eloquent section below](#eloquent)
 
+Commands
+---
+ couchbase
+  couchbase:bucket:create                                  Create a bucket.
+  couchbase:bucket:create-primary-index                    Create index on bucket to allow performing nql queries
+  couchbase:bucket:delete                                  Delete a bucket.
+  couchbase:bucket:flush                                   Remove all data on bucket (clear database).
+  couchbase:bucket:list                                    List available buckets on cluster
+  couchbase:cluster:init                                   Initialize couchbase cluster before usage
+
 
 Before usage in Laravel
 ---

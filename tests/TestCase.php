@@ -6,14 +6,10 @@ use Exception;
 use Dotenv\Dotenv;
 use ErrorException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Console\Application;
 use Illuminate\Support\Facades\Event;
 use FriendsOfCat\Couchbase\Connection;
 use FriendsOfCat\Couchbase\Events\QueryFired;
 use FriendsOfCat\Couchbase\CouchbaseServiceProvider;
-use FriendsOfCat\Couchbase\Console\Commands\ClusterInit;
-use FriendsOfCat\Couchbase\Console\Commands\BucketCreate;
-use FriendsOfCat\Couchbase\Console\Commands\BucketCreatePrimaryIndex;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -33,11 +29,6 @@ class TestCase extends \Orchestra\Testbench\TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Application::starting(function ($artisan) {
-            $artisan->call(ClusterInit::class);
-            $artisan->call(BucketCreate::class);
-            $artisan->call(BucketCreatePrimaryIndex::class);
-        });
     }
 
     protected function getCouchbaseConnection(): Connection
@@ -91,7 +82,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
             'driver' => 'couchbase',
             'port' => env('COUCHBASE_DB_PORT', 8091),
             'host' => env('COUCHBASE_DB_HOST', '127.0.0.1'),
-            'bucket' => env('COUCHBASE_DB_BUCKET', 'canvas'),
+            'bucket' => env('COUCHBASE_DB_BUCKET', 'bucket_test'),
             'username' => env('COUCHBASE_DB_USERNAME', 'Administrator'),
             'password' => env('COUCHBASE_DB_PASSWORD', 'password'),
         ]);

@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\DB;
 
 class ConnectionTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function testConnection()
     {
         $connection = DB::connection('couchbase');

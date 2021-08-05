@@ -4,6 +4,12 @@ namespace FriendsOfCat\Couchbase\Console\Commands;
 
 use Symfony\Component\Process\Process;
 
+/**
+ * Still work in progress
+ *
+ * Class ClusterInit
+ * @package FriendsOfCat\Couchbase\Console\Commands
+ */
 class ClusterInit extends Command
 {
     /**
@@ -28,11 +34,6 @@ class ClusterInit extends Command
     public function handle()
     {
         $config = config('database.connections.couchbase');
-        $host = $this->option('host') ?? $config['host'];
-        $username = $this->option('username') ?? $config['username'];
-        $password = $this->option('password') ?? $config['password'];
-        $clusterRam = $this->option('cluster-ram') ?? 1024;
-        $clusterIndexRam = $this->option('cluster-index-ram') ?? 256;
         $process = Process::fromShellCommandline(sprintf(
             'couchbase-cli cluster-init -c %s
       --cluster-username %s \
@@ -40,11 +41,11 @@ class ClusterInit extends Command
       --services data,index,query \
       --cluster-ramsize %s \
       --cluster-index-ramsize %s',
-            $host,
-            $username,
-            $password,
-            $clusterRam,
-            $clusterIndexRam
+            $config['host'],
+            $config['username'],
+            $config['password'],
+            $this->option('cluster-ram'),
+            $this->option('cluster-index-ram')
         ));
         $process->setTimeout(null);
 

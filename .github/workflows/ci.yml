@@ -46,9 +46,6 @@ jobs:
             php -m
             php -r "if(! extension_loaded('couchbase')) {throw new Exception('couchbase not found');}"
 
-      - name: Print PHP version
-        run: echo ${{ steps.setup-php.outputs.php-version }}
-
       - uses: actions/checkout@v2
 
       - name: Get Composer Cache Directory
@@ -66,6 +63,15 @@ jobs:
       - name: PHP Install Dependencies (if not cached)
         if: steps.composer-cache.outputs.cache-hit != 'true'
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest  --no-progress --prefer-dist
+
+      - name: Couchbase - Initialize cluster
+        run: |
+          docker run --rm -it couchbase:6.6 couchbase-cli cluster-init -c 127.0.0.1 \
+            --cluster-username Administrator \
+            --cluster-password password \
+            --services data,index,query \
+            --cluster-ramsize 2048 \
+            --cluster-index-ramsize 256
 
 # Commented out for later usage in dream well
 #      - name: Couchbase - Initialize cluster

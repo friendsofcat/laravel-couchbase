@@ -669,3 +669,12 @@ This is not a fully featured eloquent driver. There are still some areas where a
 - [ ] Test commands
 - [ ] Test pagination
 - [ ] Helper `uniqueId`
+- [ ] custom `RefreshDatabase` trait to recreate bucket
+Lead
+```php
+// RefreshDatabase
+$this->artisan(BucketDelete::class);
+$this->artisan(BucketCreate::class);
+$this->artisan(BucketCreatePrimaryIndex::class);
+// check hook afterApplicationCreated, beforeApplicationDestroyed
+```

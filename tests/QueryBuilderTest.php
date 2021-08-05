@@ -501,9 +501,9 @@ class QueryBuilderTest extends TestCase
         $query = $this->getCouchbaseConnection()->table('table6')->where(function ($query) {
             $query->whereRaw('meta().id = "abc"')
                 ->orWhere(function ($query) {
-            $query->whereRaw('substr(`b`, 0, 3) = "ghi"')
-                ->where(DB::raw('substr(`a`, 0, 3)'), 'def');
-        });
+                    $query->whereRaw('substr(`b`, 0, 3) = "ghi"')
+                        ->where(DB::raw('substr(`a`, 0, 3)'), 'def');
+                });
         });
         $this->assertEquals(
             'select `' . $query->from . '`.*, meta(`' . $query->from . '`).`id` as `_id` from `' . $query->from . '` where `eloquent_type` = "table6" and (meta().id = "abc" or (substr(`b`, 0, 3) = "ghi" and substr(`a`, 0, 3) = "def"))',

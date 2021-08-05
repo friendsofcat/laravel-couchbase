@@ -6,10 +6,14 @@ use Exception;
 use Dotenv\Dotenv;
 use ErrorException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Console\Application;
 use Illuminate\Support\Facades\Event;
 use FriendsOfCat\Couchbase\Connection;
 use FriendsOfCat\Couchbase\Events\QueryFired;
 use FriendsOfCat\Couchbase\CouchbaseServiceProvider;
+use FriendsOfCat\Couchbase\Console\Commands\ClusterInit;
+use FriendsOfCat\Couchbase\Console\Commands\BucketCreate;
+use FriendsOfCat\Couchbase\Console\Commands\BucketCreatePrimaryIndex;
 
 class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -29,6 +33,11 @@ class TestCase extends \Orchestra\Testbench\TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        Application::starting(function ($artisan) {
+            $artisan->call(ClusterInit::class);
+            $artisan->call(BucketCreate::class);
+            $artisan->call(BucketCreatePrimaryIndex::class);
+        });
     }
 
     protected function getCouchbaseConnection(): Connection
@@ -40,11 +49,11 @@ class TestCase extends \Orchestra\Testbench\TestCase
     }
 
     /**
-       * Define environment setup.
-       *
-       * @param \Illuminate\Foundation\Application $app
-       * @return void
-       */
+     * Define environment setup.
+     *
+     * @param \Illuminate\Foundation\Application $app
+     * @return void
+     */
     protected function getEnvironmentSetUp($app)
     {
         $app['path.base'] = __DIR__ . '/../src';

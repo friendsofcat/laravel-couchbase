@@ -34,10 +34,10 @@ class BucketCreate extends Command
         $couchbase = DB::connection('couchbase');
         $couchbase->createBucket(
             (new \Couchbase\BucketSettings())
-          ->setName($bucket)
-          ->setBucketType('couchbase')
-          ->setRamQuotaMb($bucketRam)
-          ->enableFlush($this->option('enable-flush'))
+                ->setName($bucket)
+                ->setBucketType('couchbase')
+                ->setRamQuotaMb($bucketRam)
+                ->enableFlush($this->option('enable-flush'))
         );
         $this->info(sprintf("Couchbase bucket '%s' created with %s ram", $bucket, $bucketRam));
     }

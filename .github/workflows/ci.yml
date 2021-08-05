@@ -67,21 +67,22 @@ jobs:
         if: steps.composer-cache.outputs.cache-hit != 'true'
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest  --no-progress --prefer-dist
 
-      - name: Couchbase - Initialize cluster
-        run: |
-          php artisan couchbase:cluster:init
-
-      - name: Couchbase - Verify connection
-        run: |
-          php artisan couchbase:bucket:list
-
-      - name: Couchbase - Create bucket
-        run: |
-          php artisan couchbase:bucket:create --enable-flush=true
-
-      - name: Couchbase - Create primary index
-        run: |
-          php artisan couchbase:bucket:create-primary-index
+# Commented out for later usage in dream well
+#      - name: Couchbase - Initialize cluster
+#        run: |
+#          php artisan couchbase:cluster:init
+#
+#      - name: Couchbase - Verify connection
+#        run: |
+#          php artisan couchbase:bucket:list
+#
+#      - name: Couchbase - Create bucket
+#        run: |
+#          php artisan couchbase:bucket:create --enable-flush=true
+#
+#      - name: Couchbase - Create primary index
+#        run: |
+#          php artisan couchbase:bucket:create-primary-index
 
 
       - name: Run Testsuite

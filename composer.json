@@ -38,7 +38,7 @@
         }
     },
     "scripts": {
-        "check-style": "php-cs-fixer fix --dry-run --config .php-cs-fixer.php",
+        "check-style": "php-cs-fixer fix --dry-run",
         "fix-style": "php-cs-fixer fix",
         "test": "./vendor/bin/phpunit"
     }

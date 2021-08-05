@@ -1,0 +1,95 @@
+name: Tests
+on: push
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    services:
+      couchbase:
+        image: couchbase:6.6.0
+        ports:
+          - 8091-8094:8091-8094
+          - 11210:11210
+
+    strategy:
+      matrix:
+        php: [ 7.3 ]
+
+    name: PHP ${{ matrix.php }}
+
+    steps:
+      - name: Install system dependencies
+        if: matrix.operating-system == 'ubuntu-latest'
+        run: |
+            sudo wget -O - https://packages.couchbase.com/ubuntu/couchbase.key | sudo apt-key add -
+            echo "deb https://packages.couchbase.com/ubuntu bionic bionic/main" | sudo tee /etc/apt/sources.list.d/couchbase.list
+            sudo apt-get update
+            sudo apt-get install libcouchbase-dev
+
+      - name: Install system dependencies
+        if: matrix.operating-system == 'macos-latest'
+        run: brew install libcouchbase
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: pecl
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, couchbase
+          coverage: none
+        # By default, extensions which cannot be added or removed gracefully leave an error message in the logs, the action is not interrupted. To change this behaviour you can set fail-fast flag to true.
+        env:
+          fail-fast: true
+
+      - name: Check couchbase PHP extension
+        run: |
+            php -m
+            php -r "if(! extension_loaded('couchbase')) {throw new Exception('couchbase not found');}"
+
+      - uses: actions/checkout@v2
+
+      - name: Get Composer Cache Directory
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache Composer packages
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: PHP Install Dependencies (if not cached)
+        if: steps.composer-cache.outputs.cache-hit != 'true'
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest  --no-progress --prefer-dist
+
+      - name: Couchbase - Initialize cluster
+        run: |
+          docker run --rm -it couchbase:6.6 couchbase-cli cluster-init -c 127.0.0.1 \
+            --cluster-username Administrator \
+            --cluster-password password \
+            --services data,index,query \
+            --cluster-ramsize 2048 \
+            --cluster-index-ramsize 256
+
+# Commented out for later usage in dream well
+#      - name: Couchbase - Initialize cluster
+#        run: |
+#          php artisan couchbase:cluster:init
+#
+#      - name: Couchbase - Verify connection
+#        run: |
+#          php artisan couchbase:bucket:list
+#
+#      - name: Couchbase - Create bucket
+#        run: |
+#          php artisan couchbase:bucket:create --enable-flush=true
+#
+#      - name: Couchbase - Create primary index
+#        run: |
+#          php artisan couchbase:bucket:create-primary-index
+
+
+      - name: Run Testsuite
+        run: vendor/bin/phpunit

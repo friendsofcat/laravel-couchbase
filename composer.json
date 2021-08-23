@@ -1,6 +1,5 @@
 {
     "name": "friendsofcat/laravel-couchbase",
-    "version": "0.1.0",
     "description": "A Couchbase based Eloquent model and Query builder for Laravel",
     "keywords": ["laravel","eloquent","couchbase","database","model"],
     "homepage": "https://github.com/friendsoat/laravel-couchbase",
@@ -41,5 +40,10 @@
         "check-style": "php-cs-fixer fix --dry-run",
         "fix-style": "php-cs-fixer fix",
         "test": "./vendor/bin/phpunit"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
     }
 }

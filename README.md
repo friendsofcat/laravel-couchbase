@@ -255,6 +255,18 @@ $users = User::whereBetween('votes', [1, 100])->get();
 $users = User::whereNull('updated_at')->get();
 ```
 
+**Where is missing**
+
+```php
+$users = User::whereIsMissing('updated_at')->get();
+```
+
+**Where is valued**
+
+```php
+$users = User::whereIsValued('updated_at')->get();
+```
+
 **Order By**
 
 ```php

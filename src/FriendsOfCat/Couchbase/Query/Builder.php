@@ -414,15 +414,6 @@ class Builder extends BaseBuilder
         return ! is_null($this->first([Grammar::VIRTUAL_META_ID_COLUMN]));
     }
 
-    public function isMissing($column)
-    {
-        $this->wheres[] = [
-            'column' => $column,
-        ];
-
-        return $this;
-    }
-
     /**
      * Add a where between statement to the query.
      *

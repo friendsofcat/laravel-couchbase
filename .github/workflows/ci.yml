@@ -3,6 +3,8 @@ on: push
 jobs:
   tests:
     runs-on: ubuntu-latest
+    container:
+      image: kirschbaumdevelopment/laravel-test-runner:7.4-couch-mongo
 
     services:
       couchbase:
@@ -18,34 +20,6 @@ jobs:
     name: PHP ${{ matrix.php }}
 
     steps:
-      - name: Install system dependencies
-        if: matrix.operating-system == 'ubuntu-latest'
-        run: |
-            sudo wget -O - https://packages.couchbase.com/ubuntu/couchbase.key | sudo apt-key add -
-            echo "deb https://packages.couchbase.com/ubuntu bionic bionic/main" | sudo tee /etc/apt/sources.list.d/couchbase.list
-            sudo apt-get update
-            sudo apt-get install libcouchbase-dev
-
-      - name: Install system dependencies
-        if: matrix.operating-system == 'macos-latest'
-        run: brew install libcouchbase
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          tools: pecl
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, couchbase
-          coverage: none
-        # By default, extensions which cannot be added or removed gracefully leave an error message in the logs, the action is not interrupted. To change this behaviour you can set fail-fast flag to true.
-        env:
-          fail-fast: true
-
-      - name: Check couchbase PHP extension
-        run: |
-            php -m
-            php -r "if(! extension_loaded('couchbase')) {throw new Exception('couchbase not found');}"
-
       - uses: actions/checkout@v2
 
       - name: Get Composer Cache Directory
@@ -66,7 +40,7 @@ jobs:
 
       - name: Couchbase - Initialize cluster
         run: |
-          docker run --rm -it couchbase:6.6 couchbase-cli cluster-init -c 127.0.0.1 \
+          docker run --rm couchbase:6.6 couchbase-cli cluster-init -c 127.0.0.1 \
             --cluster-username Administrator \
             --cluster-password password \
             --services data,index,query \

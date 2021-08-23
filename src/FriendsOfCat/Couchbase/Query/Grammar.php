@@ -210,6 +210,54 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "where is missing" clause.
+     *
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param array $where
+     * @return string
+     */
+    protected function whereIsMissing(BaseBuilder $query, $where)
+    {
+        return $this->wrap($where['column']) . ' IS MISSING';
+    }
+
+    /**
+     * Compile a "where is not missing" clause.
+     *
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param array $where
+     * @return string
+     */
+    protected function whereIsNotMissing(BaseBuilder $query, $where)
+    {
+        return $this->wrap($where['column']) . ' IS NOT MISSING';
+    }
+
+    /**
+     * Compile a "where is valued" clause.
+     *
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param array $where
+     * @return string
+     */
+    protected function whereIsValued(BaseBuilder $query, $where)
+    {
+        return $this->wrap($where['column']) . ' IS VALUED';
+    }
+
+    /**
+     * Compile a "where is not valued" clause.
+     *
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param array $where
+     * @return string
+     */
+    protected function whereIsNotValued(BaseBuilder $query, $where)
+    {
+        return $this->wrap($where['column']) . ' IS NOT VALUED';
+    }
+
+    /**
      * Compile a "between" where clause.
      *
      * @param BaseBuilder $query

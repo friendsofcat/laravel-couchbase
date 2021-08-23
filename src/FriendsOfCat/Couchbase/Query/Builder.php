@@ -58,6 +58,8 @@ class Builder extends BaseBuilder
     /**
      * All of the available clause operators.
      *
+     * see https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/comparisonops.html
+     *
      * @var array
      */
     public $operators = [
@@ -410,6 +412,15 @@ class Builder extends BaseBuilder
     public function exists()
     {
         return ! is_null($this->first([Grammar::VIRTUAL_META_ID_COLUMN]));
+    }
+
+    public function isMissing($column)
+    {
+        $this->wheres[] = [
+            'column' => $column,
+        ];
+
+        return $this;
     }
 
     /**
@@ -846,6 +857,70 @@ class Builder extends BaseBuilder
         }
 
         return parent::whereNull($column, $boolean, $not);
+    }
+
+    /**
+     * Add a "where is missing" clause to the query.
+     * In other words, no value for field found
+     *
+     * @param  string|array  $columns
+     * @param string $boolean
+     * @param bool $not
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereIsMissing($columns, $boolean = 'and', $not = false)
+    {
+        $type = $not ? 'IsNotMissing' : 'IsMissing';
+
+        foreach (Arr::wrap($columns) as $column) {
+            $this->wheres[] = compact('type', 'column', 'boolean');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a "where is not missing" clause to the query.
+     *
+     * @param  string|array  $columns
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereIsNotMissing($columns, $boolean = 'and')
+    {
+        return $this->whereIsMissing($columns, $boolean, true);
+    }
+
+    /**
+     * Add a "where is valued" clause to the query.
+     * In other words, value for field found. Value is neither missing nor NULL
+     *
+     * @param  string|array  $columns
+     * @param string $boolean
+     * @param bool $not
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereIsValued($columns, $boolean = 'and', $not = false)
+    {
+        $type = $not ? 'IsNotValued' : 'IsValued';
+
+        foreach (Arr::wrap($columns) as $column) {
+            $this->wheres[] = compact('type', 'column', 'boolean');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a "where is not valued" clause to the query.
+     *
+     * @param  string|array  $columns
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereIsNotValued($columns, $boolean = 'and')
+    {
+        return $this->whereIsValued($columns, $boolean, true);
     }
 
     /**

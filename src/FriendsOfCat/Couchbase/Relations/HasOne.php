@@ -53,20 +53,15 @@ class HasOne extends EloquentHasOne
     }
 
     /**
-     * Add the constraints for a relationship query.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param \Illuminate\Database\Eloquent\Builder $parent
-     * @param array|mixed $columns
-     * @return \Illuminate\Database\Eloquent\Builder
+     * Get the query builder that will contain the relationship constraints.
+     * @returns \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationQuery(Builder $query, Builder $parent, $columns = ['*'])
+    protected function getRelationQuery()
     {
-        $query->select($columns);
-
-        $key = $this->wrap($this->getQualifiedParentKeyName());
-
-        return $query->whereNotNull($this->getHasCompareKey());
+        // Builder $query, Builder $parent, $columns = ['*']
+        return $this->isOneOfMany()
+        ? $this->oneOfManySubQuery
+        : $this->query;
     }
 
     /**

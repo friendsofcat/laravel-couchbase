@@ -38,32 +38,18 @@ jobs:
         if: steps.composer-cache.outputs.cache-hit != 'true'
         run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest  --no-progress --prefer-dist
 
-      - name: Couchbase - Initialize cluster
+      - name: Prepare environment
         run: |
-          docker run --rm couchbase:6.6 couchbase-cli cluster-init -c 127.0.0.1 \
-            --cluster-username Administrator \
-            --cluster-password password \
-            --services data,index,query \
-            --cluster-ramsize 2048 \
-            --cluster-index-ramsize 256
+          cp .env.ci .env.testing
 
-# Commented out for later usage in dream well
-#      - name: Couchbase - Initialize cluster
-#        run: |
-#          php artisan couchbase:cluster:init
-#
-#      - name: Couchbase - Verify connection
-#        run: |
-#          php artisan couchbase:bucket:list
-#
-#      - name: Couchbase - Create bucket
-#        run: |
-#          php artisan couchbase:bucket:create --enable-flush=true
-#
-#      - name: Couchbase - Create primary index
-#        run: |
-#          php artisan couchbase:bucket:create-primary-index
-
+      - name: Setup Couchbase
+        run: bash ./ci/couchbase/setup.sh
+        env:
+          COUCHBASE_USERNAME: "Administrator"
+          COUCHBASE_PASSWORD: "password"
+          COUCHBASE_HOST: "couchbase"
+          COUCHBASE_PORT: "8091"
+          COUCHBASE_BUCKET: "canvas"
 
       - name: Run Testsuite
         run: vendor/bin/phpunit

@@ -350,7 +350,7 @@ class Connection extends \Illuminate\Database\Connection
      */
     protected function createConnection()
     {
-        $connectionString = 'couchbase://' . $this->config['host'];
+        $connectionString = sprintf('couchbase://%s:%s', $this->config['host'], $this->config['port']);
         $options = new \Couchbase\ClusterOptions();
         $options->credentials($this->config['username'], $this->config['password']);
         $cluster = new \Couchbase\Cluster($connectionString, $options);

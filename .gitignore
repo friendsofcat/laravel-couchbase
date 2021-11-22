@@ -8,6 +8,7 @@ composer.lock
 *.project
 .idea/
 .env
+.env.testing
 .php-cs-fixer.cache
 sql-log.sql
 .phpunit.result.cache

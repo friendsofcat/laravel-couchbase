@@ -28,7 +28,7 @@ class Connection extends \Illuminate\Database\Connection
     protected $metrics;
 
     /** @var int  default consistency */
-    protected $consistency = \Couchbase\QueryScanConsistency::REQUEST_PLUS;
+    protected $consistency = 2;
 
     /**
      * The Couchbase connection handler.

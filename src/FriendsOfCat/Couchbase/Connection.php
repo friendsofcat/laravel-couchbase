@@ -470,7 +470,12 @@ class Connection extends \Illuminate\Database\Connection
         // $manager->createPrimaryIndex($bucket,
         //   (new CreateQueryPrimaryIndexOptions())->ignoreIfExists(true)
         // );
-        return $this->runN1qlQuery(sprintf('create primary index on %s', $bucket), []);
+        return $this->runN1qlQuery(sprintf('CREATE PRIMARY INDEX `%s_primary_index` on %s', $bucket, $bucket), []);
+    }
+
+    public function createIndex(string $query)
+    {
+        return $this->runN1qlQuery($query, []);
     }
 
     public function __call($method, $parameters)

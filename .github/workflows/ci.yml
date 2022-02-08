@@ -8,14 +8,14 @@ jobs:
 
     services:
       couchbase:
-        image: couchbase:6.6.0
+        image: couchbase:7.0.3
         ports:
           - 8091-8094:8091-8094
           - 11210:11210
 
     strategy:
       matrix:
-        php: [ 7.3 ]
+        php: [ 7.4 ]
 
     name: PHP ${{ matrix.php }}
 

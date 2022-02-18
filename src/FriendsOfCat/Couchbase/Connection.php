@@ -250,10 +250,8 @@ class Connection extends \Illuminate\Database\Connection
      * @param array $bindings
      * @return mixed
      */
-    protected function runN1qlQuery(string $n1ql, array $bindings)
+    protected function runN1qlQuery(string $n1ql, array $bindings = [])
     {
-        $this->createConnection();
-
         if (count($bindings) > 0) {
             $n1ql = $this->getQueryGrammar()->applyBindings($n1ql, $bindings);
             $bindings = [];

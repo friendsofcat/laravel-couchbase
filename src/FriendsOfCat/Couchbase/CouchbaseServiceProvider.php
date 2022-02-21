@@ -9,7 +9,7 @@ use FriendsOfCat\Couchbase\Console\Commands\BucketFlush;
 use FriendsOfCat\Couchbase\Console\Commands\ClusterInit;
 use FriendsOfCat\Couchbase\Console\Commands\BucketCreate;
 use FriendsOfCat\Couchbase\Console\Commands\BucketDelete;
-use FriendsOfCat\Couchbase\Console\Commands\BucketCreateIndex;
+use FriendsOfCat\Couchbase\Console\Commands\BucketRunQuery;
 use FriendsOfCat\Couchbase\Console\Commands\BucketCreatePrimaryIndex;
 
 class CouchbaseServiceProvider extends ServiceProvider
@@ -30,7 +30,7 @@ class CouchbaseServiceProvider extends ServiceProvider
                 BucketCreate::class,
                 BucketDelete::class,
                 BucketFlush::class,
-                BucketCreateIndex::class,
+                BucketRunQuery::class,
                 BucketCreatePrimaryIndex::class,
                 BucketList::class,
                 ClusterInit::class,

@@ -473,7 +473,7 @@ class Connection extends \Illuminate\Database\Connection
         return $this->runN1qlQuery(sprintf('CREATE PRIMARY INDEX `%s_primary_index` on %s', $bucket, $bucket), []);
     }
 
-    public function createIndex(string $query)
+    public function runRawQuery(string $query)
     {
         return $this->runN1qlQuery($query, []);
     }

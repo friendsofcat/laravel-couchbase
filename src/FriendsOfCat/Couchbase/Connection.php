@@ -254,7 +254,6 @@ class Connection extends \Illuminate\Database\Connection
     {
         if (count($bindings) > 0) {
             $n1ql = $this->getQueryGrammar()->applyBindings($n1ql, $bindings);
-            $bindings = [];
         }
         $opts = new \Couchbase\QueryOptions();
         $opts->scanConsistency($this->consistency);

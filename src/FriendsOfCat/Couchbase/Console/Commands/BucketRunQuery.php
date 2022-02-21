@@ -2,17 +2,18 @@
 
 namespace FriendsOfCat\Couchbase\Console\Commands;
 
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use FriendsOfCat\Couchbase\Connection;
 
-class BucketCreateIndex extends Command
+class BucketRunQuery extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'couchbase:bucket:create-index {--query= : N1QL query for creating the index}';
+    protected $signature = 'couchbase:bucket:run-query {--query= : Raw N1QL query to run}';
 
     /**
      * The console command description.
@@ -26,12 +27,13 @@ class BucketCreateIndex extends Command
         $config = config('database.connections.couchbase');
 
         if (! $query = $this->option('query')) {
-            $this->error('The --query parameter is required to create an index');
+            $this->error('The --query parameter is required to run a query');
         }
 
         /** @var Connection $couchbase */
         $couchbase = DB::connection('couchbase');
-        $couchbase->createIndex($query);
-        $this->info('Couchbase index created');
+        $this->info(print_r($couchbase->runRawQuery($query), true));
+
+        return Command::SUCCESS;
     }
 }

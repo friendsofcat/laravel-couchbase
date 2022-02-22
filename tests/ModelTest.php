@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Illuminate\Support\Str;
 use Tests\Models\Book;
 use Tests\Models\Item;
 use Tests\Models\Soft;
@@ -19,6 +20,14 @@ class ModelTest extends TestCase
         $this->assertEquals(false, $user->exists);
         $this->assertEquals('users', $user->getTable());
         $this->assertEquals('_id', $user->getKeyName());
+    }
+  
+    public function testSqlQuery () {
+      $query = 'select `:bucket`.*, meta(`:bucket`).`id` as `_id` from `:bucket` where `table` = ?';
+      $bucket = config('database.connections.couchbase.bucket');
+      $query = (string) Str::of($query)
+        ->replace(':bucket', $bucket);
+      $this->assertEquals($query, User::query()->toSql());
     }
 
     public function testInsert()

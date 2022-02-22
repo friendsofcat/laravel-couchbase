@@ -5,7 +5,7 @@ An Eloquent model and Query builder with support for Couchbase, using the origin
 
 ## Credits
 - Created from previous work of 
-  * [Huong-Da-Online/laravel-couchbase](https://github.com/Huong-Da-Online/laravel-couchbase)
+  * [friendsofcat/laravel-couchbase](https://github.com/friendsofcat/laravel-couchbase)
   * [ORT-Interactive-GmbH/laravel-couchbase](https://github.com/ORT-Interactive-GmbH/laravel-couchbase)
 - [SDK references](https://docs.couchbase.com/sdk-api/couchbase-php-client/namespaces/couchbase.html)
 
@@ -24,12 +24,19 @@ Table of contents
 Installation
 ------------
 
+## Couchbase compatibility
+
+| Couchbase | Eloquent driver |
+| --- | --- |
+| 6.x | 1.x |
+| 7.x | 2.x |
+
 Make sure you have the Couchbase PHP driver installed. You can find installation instructions at http://developer.couchbase.com/documentation/server/current/sdk/php/start-using-sdk.html
 
 Installation using composer:
 
 ```
-composer require huong-da-online/laravel-couchbase
+composer require friendsofcat/laravel-couchbase
 ```
 
 And add the service provider in `config/app.php`:

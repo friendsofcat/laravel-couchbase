@@ -6,12 +6,12 @@ namespace FriendsOfCat\Couchbase;
 
 use Couchbase\Bucket;
 use Couchbase\Cluster;
-use Couchbase\N1qlQuery;
 use Couchbase\BucketManager;
 use Couchbase\BucketSettings;
-use Couchbase\QueryIndexManager;
-use Couchbase\CreateQueryPrimaryIndexOptions;
+use Couchbase\CollectionSpec;
+use Couchbase\ScopeSpec;
 use FriendsOfCat\Couchbase\Events\QueryFired;
+use FriendsOfCat\Couchbase\Query\Builder;
 use FriendsOfCat\Couchbase\Query\Builder as QueryBuilder;
 use FriendsOfCat\Couchbase\Query\Grammar as QueryGrammar;
 
@@ -104,11 +104,8 @@ class Connection extends \Illuminate\Database\Connection
 
     /**
      * Begin a fluent query against a set of document types.
-     *
-     * @param string $type
-     * @return Query\Builder
      */
-    public function builder($type)
+    public function builder(string $type): Builder
     {
         $query = new QueryBuilder($this, $this->getQueryGrammar(), $this->getPostProcessor());
 
@@ -143,18 +140,6 @@ class Connection extends \Illuminate\Database\Connection
 
             return $reflectionProperty->getValue($result) === 'success';
         });
-    }
-
-    /**
-     * @param N1qlQuery $query
-     *
-     * @return mixed
-     */
-    protected function executeQuery(N1qlQuery $query)
-    {
-        $this->createConnection();
-
-        return $this->bucket->query($query);
     }
 
     /**
@@ -356,12 +341,24 @@ class Connection extends \Illuminate\Database\Connection
         return $cluster;
     }
 
+    public function reconnect()
+    {
+        $this->createConnection();
+    }
+
+    public function reconnectIfMissingConnection()
+    {
+        if (! $this->cluster) {
+            $this->reconnect();
+        }
+    }
+
     /**
      * Disconnect from the underlying Couchbase connection.
      */
     public function disconnect()
     {
-        unset($this->cluster);
+        $this->cluster = null;
     }
 
     /**
@@ -473,6 +470,36 @@ class Connection extends \Illuminate\Database\Connection
     public function runRawQuery(string $query)
     {
         return $this->runN1qlQuery($query, []);
+    }
+
+    public function createScope(string $scope): void
+    {
+        $this->getBucket()->collections()->createScope($scope);
+    }
+
+    public function dropScope(string $scope): void
+    {
+        $this->getBucket()->collections()->dropScope($scope);
+    }
+
+    public function getScope(string $scope): ScopeSpec
+    {
+        return $this->getBucket()->collections()->getScope($scope);
+    }
+
+    public function listScopes(): array
+    {
+        return $this->getBucket()->collections()->getAllScopes();
+    }
+
+    public function createCollection(CollectionSpec $collectionSpec): void
+    {
+        $this->getBucket()->collections()->createCollection($collectionSpec);
+    }
+
+    public function dropCollection(CollectionSpec $collectionSpec): void
+    {
+        $this->getBucket()->collections()->dropCollection($collectionSpec);
     }
 
     public function __call($method, $parameters)

@@ -457,6 +457,13 @@ class Connection extends \Illuminate\Database\Connection
         return $this->getBucketManager()->getAllBuckets();
     }
 
+    public function createPrimaryIndexForKeyspace(string $bucket, string $scope, string $collection)
+    {
+        $keyspace = "`default`:`{$bucket}`.`{$scope}`.`{$collection}`";
+
+        return $this->runN1qlQuery(sprintf('CREATE PRIMARY INDEX ON %s', $keyspace), []);
+    }
+
     public function createPrimaryIndex(string $bucket)
     {
         // API from the SDK not working so running the query directly.
@@ -464,6 +471,7 @@ class Connection extends \Illuminate\Database\Connection
         // $manager->createPrimaryIndex($bucket,
         //   (new CreateQueryPrimaryIndexOptions())->ignoreIfExists(true)
         // );
+
         return $this->runN1qlQuery(sprintf('CREATE PRIMARY INDEX `%s_primary_index` on %s', $bucket, $bucket), []);
     }
 
@@ -492,13 +500,23 @@ class Connection extends \Illuminate\Database\Connection
         return $this->getBucket()->collections()->getAllScopes();
     }
 
-    public function createCollection(CollectionSpec $collectionSpec): void
+    public function createCollection(string $collection, string $scope = '_default'): void
     {
+        $collectionSpec = new CollectionSpec();
+
+        $collectionSpec->setName($collection);
+        $collectionSpec->setScopeName($scope);
+
         $this->getBucket()->collections()->createCollection($collectionSpec);
     }
 
-    public function dropCollection(CollectionSpec $collectionSpec): void
+    public function dropCollection(string $collection, string $scope = '_default'): void
     {
+        $collectionSpec = new CollectionSpec();
+
+        $collectionSpec->setName($collection);
+        $collectionSpec->setScopeName($scope);
+
         $this->getBucket()->collections()->dropCollection($collectionSpec);
     }
 

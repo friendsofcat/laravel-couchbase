@@ -192,9 +192,14 @@ class Grammar extends BaseGrammar
 
     protected function keySpace(Builder $query): string
     {
-        $scope = $query->connection->getConfig('scope') ?? '_default';
+        $scope = $this->getScope($query);
 
         return "{$this->wrapTable($query->from)}.`{$scope}`.{$this->wrapTable($query->type)}";
+    }
+
+    private function getScope(Builder $query): string
+    {
+        return $query->connection->getConfig('scope') ?? '_default';
     }
 
     /**
@@ -408,7 +413,7 @@ class Grammar extends BaseGrammar
      */
     public function compileUpdate(BaseBuilder $query, $values)
     {
-        $scope = config('database.connections.couchbase.scope');
+        $scope = $this->getScope($query);
 
         // keyspace-ref:
         $table = "{$this->wrapTable($query->from)}.`{$scope}`.{$this->wrapTable($query->type)}";

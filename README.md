@@ -80,6 +80,7 @@ composer require friendsofcat/laravel-couchbase
     'port'     => env('DB_PORT', 8091),
     'bucket'   => env('DB_DATABASE'),
     'username' => env('DB_USERNAME'),
+    'scope' => 'custom-scope' // will use _default if the scope is not specified
 ],
 ```
 
@@ -142,9 +143,7 @@ use FriendsOfCat\Couchbase\Eloquent\Model as Eloquent;
 class User extends Eloquent {}
 ```
 
-As Couchbase does not provide the concept of tables, documents will instead be defined by a property called `_type`. Like the original Eloquent, the lower-casem plural name of the class will be used as the "table" name and will be placed inside the `_type` property of each document.
-
-You may specify a custom type (alias for table) by defining a `table` property on your model:
+Models will be stored under the scope defined in the database config file. The collection for every model has to match the `$table` property of the model. In the example below, they collection used for querying would be `my_users`. The full keyspace is in the `{bucketname}.{scope}.{collection}` format.
 
 ```php
 use FriendsOfCat\Couchbase\Eloquent\Model as Eloquent;
@@ -687,7 +686,7 @@ DB::connection()->disableQueryLog();
 
 ## TODO
 This is not a fully featured eloquent driver. There are still some areas where attention would be needed. Just to name few:
-- [ ] Implement _table_ concept using [collection/scope](https://docs.couchbase.com/sdk-api/couchbase-php-client/classes/Couchbase-CollectionManager.html) instead of `type`. This could improve performance
+- [X] Implement _table_ concept using [collection/scope](https://docs.couchbase.com/sdk-api/couchbase-php-client/classes/Couchbase-CollectionManager.html) instead of `type`. This could improve performance
 - [ ] Test commands
 - [ ] Test pagination
 - [ ] Helper `uniqueId`

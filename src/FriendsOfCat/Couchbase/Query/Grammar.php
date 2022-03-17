@@ -192,8 +192,7 @@ class Grammar extends BaseGrammar
 
     protected function keySpace(Builder $query): string
     {
-        //@todo make scope configurable in config file
-        $scope = 'app';
+        $scope = $query->connection->getConfig('scope') ?? '_default';
 
         return "{$this->wrapTable($query->from)}.`{$scope}`.{$this->wrapTable($query->type)}";
     }
@@ -409,10 +408,10 @@ class Grammar extends BaseGrammar
      */
     public function compileUpdate(BaseBuilder $query, $values)
     {
-        //@todo make scope configurable in config file
+        $scope = config('database.connections.couchbase.scope');
 
         // keyspace-ref:
-        $table = "{$this->wrapTable($query->from)}.`app`.{$this->wrapTable($query->type)}";
+        $table = "{$this->wrapTable($query->from)}.`{$scope}`.{$this->wrapTable($query->type)}";
         // use keys/index clause:
         $useClause = $this->compileUse($query);
         // returning-clause

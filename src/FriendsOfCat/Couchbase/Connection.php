@@ -510,11 +510,11 @@ class Connection extends \Illuminate\Database\Connection
         $this->getBucket()->collections()->createCollection($collectionSpec);
     }
 
-    public function dropCollection(string $collection, string $scope = '_default'): void
+    public function dropCollection(string $name, string $scope = '_default'): void
     {
         $collectionSpec = new CollectionSpec();
 
-        $collectionSpec->setName($collection);
+        $collectionSpec->setName($name);
         $collectionSpec->setScopeName($scope);
 
         $this->getBucket()->collections()->dropCollection($collectionSpec);

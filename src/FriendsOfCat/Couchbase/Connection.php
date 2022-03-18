@@ -500,11 +500,11 @@ class Connection extends \Illuminate\Database\Connection
         return $this->getBucket()->collections()->getAllScopes();
     }
 
-    public function createCollection(string $collection, string $scope = '_default'): void
+    public function createCollection(string $name, string $scope = '_default'): void
     {
         $collectionSpec = new CollectionSpec();
 
-        $collectionSpec->setName($collection);
+        $collectionSpec->setName($name);
         $collectionSpec->setScopeName($scope);
 
         $this->getBucket()->collections()->createCollection($collectionSpec);

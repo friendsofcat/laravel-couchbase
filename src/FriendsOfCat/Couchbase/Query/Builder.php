@@ -2,6 +2,7 @@
 
 namespace FriendsOfCat\Couchbase\Query;
 
+use Couchbase\Bucket;
 use Couchbase\Exception;
 use Illuminate\Support\Arr;
 use FriendsOfCat\Couchbase\Helper;
@@ -151,28 +152,18 @@ class Builder extends BaseBuilder
     /**
      * Create a new query builder instance.
      *
-     * @param ConnectionInterface $connection
      * @param BaseGrammar $grammar
      * @param Processor $processor
      * @throws \Exception
      * @return void
      */
     public function __construct(
-        ConnectionInterface $connection,
-        BaseGrammar $grammar = null,
+        Connection $connection,
+        Grammar $grammar = null,
         Processor $processor = null
     ) {
-        if (! ($connection instanceof Connection)) {
-            throw new \Exception('Argument 1 passed to ' . get_class($this) . '::__construct() must be an instance of ' . Connection::class . ', instance of ' . get_class($connection) . ' given.');
-        }
-
-        if (! ($grammar === null || $grammar instanceof Grammar)) {
-            throw new \Exception('Argument 2 passed to ' . get_class($this) . '::__construct() must be an instance of ' . Grammar::class . ', instance of ' . get_class($grammar) . ' given.');
-        }
-
         parent::__construct($connection, $grammar, $processor);
         $this->useCollections = $this->shouldUseCollections();
-        $this->returning([$this->connection->getBucketName() . '.*']);
     }
 
     /**
@@ -257,10 +248,6 @@ class Builder extends BaseBuilder
     {
         $this->from = $this->connection->getBucketName();
         $this->type = $table;
-
-        if (! is_null($table)) {
-            $this->where(Helper::TYPE_NAME, $table);
-        }
 
         return $this;
     }
@@ -505,20 +492,20 @@ class Builder extends BaseBuilder
 
         if ($batch) {
             foreach ($values as &$value) {
-                $value[Helper::TYPE_NAME] = $this->type;
                 $key = Helper::getUniqueId($this->type);
                 $result = $this
                     ->connection
                     ->getBucket()
-                    ->defaultCollection()
+                    ->scope(config('database.connections.couchbase.scope'))
+                    ->collection($this->type)
                     ->upsert($key, Grammar::removeMissingValue($value));
             }
         } else {
-            $values[Helper::TYPE_NAME] = $this->type;
             $result = $this
                 ->connection
                 ->getBucket()
-                ->defaultCollection()
+                ->scope(config('database.connections.couchbase.scope'))
+                ->collection($this->type)
                 ->upsert($this->keys, Grammar::removeMissingValue($values));
         }
 
@@ -952,20 +939,6 @@ class Builder extends BaseBuilder
         $this->options = $options;
 
         return $this;
-    }
-
-    /**
-     * @param string|int|array $values
-     *
-     * @return array
-     */
-    protected function detectValues($values)
-    {
-        foreach ($values as &$value) {
-            $value[Helper::TYPE_NAME] = $this->type;
-        }
-
-        return [$values];
     }
 
     /**

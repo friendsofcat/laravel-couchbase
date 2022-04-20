@@ -3,8 +3,6 @@
 namespace Tests;
 
 use Couchbase\BaseException;
-use Couchbase\CollectionMissingException;
-use Couchbase\CollectionSpec;
 use Couchbase\HttpException;
 use Illuminate\Support\Facades\DB;
 

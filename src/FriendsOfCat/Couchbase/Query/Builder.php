@@ -2,7 +2,6 @@
 
 namespace FriendsOfCat\Couchbase\Query;
 
-use Couchbase\Bucket;
 use Couchbase\Exception;
 use Illuminate\Support\Arr;
 use FriendsOfCat\Couchbase\Helper;
@@ -10,7 +9,6 @@ use Illuminate\Support\Collection;
 use FriendsOfCat\Couchbase\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar as BaseGrammar;
 
@@ -404,13 +402,13 @@ class Builder extends BaseBuilder
     /**
      * Add a where between statement to the query.
      *
-     * @param string $column
-     * @param array $values
-     * @param string $boolean
-     * @param bool $not
-     * @return Builder
+     * @param  string|\Illuminate\Database\Query\Expression  $column
+     * @param  iterable  $values
+     * @param  string  $boolean
+     * @param  bool  $not
+     * @return $this
      */
-    public function whereBetween($column, array $values, $boolean = 'and', $not = false)
+    public function whereBetween($column, iterable $values, $boolean = 'and', $not = false)
     {
         $type = 'between';
 

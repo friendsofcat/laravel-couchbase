@@ -165,7 +165,7 @@ class Grammar extends BaseGrammar
         }
 
         if ($query->columns === ['*']) {
-            $query->columns = [$query->type.'.*'];
+            $query->columns = [$query->type . '.*'];
             $query->columns[] = self::VIRTUAL_META_ID_COLUMN;
         }
 

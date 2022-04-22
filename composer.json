@@ -5,16 +5,16 @@
     "homepage": "https://github.com/friendsoat/laravel-couchbase",
     "license" : "MIT",
     "require": {
-        "php": "^8.0",
-        "illuminate/support": "^9.0",
-        "illuminate/container": "^9.0",
-        "illuminate/database": "^9.0",
-        "illuminate/events": "^9.0",
+        "php": "^7.4",
+        "illuminate/support": "^8.0",
+        "illuminate/container": "^8.0",
+        "illuminate/database": "^8.0",
+        "illuminate/events": "^8.0",
         "ext-couchbase": ">=3.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.3.3",
-        "orchestra/testbench": "^7.2",
+        "orchestra/testbench": "^6.2",
         "mockery/mockery": "^1.4.2",
         "ext-json": "*",
         "vlucas/phpdotenv": "^5.3"

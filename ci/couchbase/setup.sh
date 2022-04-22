@@ -6,7 +6,7 @@ echo "Install couchbase required tools for cli usage below"
 curl -O https://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-amd64.deb
 dpkg -i ./couchbase-release-1.0-amd64.deb
 apt-get update
-apt-get install -y couchbase-server=6.6.0
+apt-get install -y couchbase-server=6.6.*
 export PATH=$PATH:/opt/couchbase/bin
 
 

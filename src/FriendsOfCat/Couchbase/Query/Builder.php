@@ -3,13 +3,13 @@
 namespace FriendsOfCat\Couchbase\Query;
 
 use Couchbase\Exception;
-use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Arr;
 use FriendsOfCat\Couchbase\Helper;
 use Illuminate\Support\Collection;
 use FriendsOfCat\Couchbase\Connection;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use Illuminate\Database\Query\Grammars\Grammar as BaseGrammar;
 

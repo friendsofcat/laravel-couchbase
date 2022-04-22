@@ -4,7 +4,7 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     container:
-      image: kirschbaumdevelopment/laravel-test-runner:8.0-couch-mongo
+      image: kirschbaumdevelopment/laravel-test-runner:7.4-couch-mongo
 
     services:
       couchbase:
@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        php: [ 8.0 ]
+        php: [ 7.4 ]
 
     name: PHP ${{ matrix.php }}
 

@@ -12,7 +12,6 @@ class AuthTest extends TestCase
 
     public function testAuthAttempt()
     {
-        $this->markTestSkipped();
         $user = User::create([
             'name' => 'John Doe',
             'email' => 'john@doe.com',

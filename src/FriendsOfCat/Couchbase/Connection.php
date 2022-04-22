@@ -6,11 +6,11 @@ namespace FriendsOfCat\Couchbase;
 
 use Couchbase\Bucket;
 use Couchbase\Cluster;
-use Couchbase\ScopeSpec;
+use Couchbase\N1qlQuery;
 use Couchbase\BucketManager;
 use Couchbase\BucketSettings;
-use Couchbase\CollectionSpec;
-use FriendsOfCat\Couchbase\Query\Builder;
+use Couchbase\QueryIndexManager;
+use Couchbase\CreateQueryPrimaryIndexOptions;
 use FriendsOfCat\Couchbase\Events\QueryFired;
 use FriendsOfCat\Couchbase\Query\Builder as QueryBuilder;
 use FriendsOfCat\Couchbase\Query\Grammar as QueryGrammar;
@@ -104,8 +104,11 @@ class Connection extends \Illuminate\Database\Connection
 
     /**
      * Begin a fluent query against a set of document types.
+     *
+     * @param string $type
+     * @return Query\Builder
      */
-    public function builder(string $type): Builder
+    public function builder($type)
     {
         $query = new QueryBuilder($this, $this->getQueryGrammar(), $this->getPostProcessor());
 
@@ -140,6 +143,18 @@ class Connection extends \Illuminate\Database\Connection
 
             return $reflectionProperty->getValue($result) === 'success';
         });
+    }
+
+    /**
+     * @param N1qlQuery $query
+     *
+     * @return mixed
+     */
+    protected function executeQuery(N1qlQuery $query)
+    {
+        $this->createConnection();
+
+        return $this->bucket->query($query);
     }
 
     /**
@@ -341,18 +356,6 @@ class Connection extends \Illuminate\Database\Connection
         return $cluster;
     }
 
-    public function reconnect()
-    {
-        $this->createConnection();
-    }
-
-    public function reconnectIfMissingConnection()
-    {
-        if (! $this->cluster) {
-            $this->reconnect();
-        }
-    }
-
     /**
      * Disconnect from the underlying Couchbase connection.
      */
@@ -457,13 +460,6 @@ class Connection extends \Illuminate\Database\Connection
         return $this->getBucketManager()->getAllBuckets();
     }
 
-    public function createPrimaryIndexForKeyspace(string $bucket, string $scope, string $collection)
-    {
-        $keyspace = "`default`:`{$bucket}`.`{$scope}`.`{$collection}`";
-
-        return $this->runN1qlQuery(sprintf('CREATE PRIMARY INDEX ON %s', $keyspace), []);
-    }
-
     public function createPrimaryIndex(string $bucket)
     {
         // API from the SDK not working so running the query directly.
@@ -471,53 +467,12 @@ class Connection extends \Illuminate\Database\Connection
         // $manager->createPrimaryIndex($bucket,
         //   (new CreateQueryPrimaryIndexOptions())->ignoreIfExists(true)
         // );
-
         return $this->runN1qlQuery(sprintf('CREATE PRIMARY INDEX `%s_primary_index` on %s', $bucket, $bucket), []);
     }
 
     public function runRawQuery(string $query)
     {
         return $this->runN1qlQuery($query, []);
-    }
-
-    public function createScope(string $scope): void
-    {
-        $this->getBucket()->collections()->createScope($scope);
-    }
-
-    public function dropScope(string $scope): void
-    {
-        $this->getBucket()->collections()->dropScope($scope);
-    }
-
-    public function getScope(string $scope): ScopeSpec
-    {
-        return $this->getBucket()->collections()->getScope($scope);
-    }
-
-    public function listScopes(): array
-    {
-        return $this->getBucket()->collections()->getAllScopes();
-    }
-
-    public function createCollection(string $name, string $scope = '_default'): void
-    {
-        $collectionSpec = new CollectionSpec();
-
-        $collectionSpec->setName($name);
-        $collectionSpec->setScopeName($scope);
-
-        $this->getBucket()->collections()->createCollection($collectionSpec);
-    }
-
-    public function dropCollection(string $name, string $scope = '_default'): void
-    {
-        $collectionSpec = new CollectionSpec();
-
-        $collectionSpec->setName($name);
-        $collectionSpec->setScopeName($scope);
-
-        $this->getBucket()->collections()->dropCollection($collectionSpec);
     }
 
     public function __call($method, $parameters)

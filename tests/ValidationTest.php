@@ -11,8 +11,6 @@ class ValidationTest extends TestCase
 
     public function testUnique()
     {
-        $this->markTestSkipped();
-
         $validator = Validator::make(
             ['name' => 'John Doe'],
             ['name' => 'required|unique:couchbase.users']

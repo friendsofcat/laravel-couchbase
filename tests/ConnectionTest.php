@@ -2,8 +2,6 @@
 
 namespace Tests;
 
-use Couchbase\BaseException;
-use Couchbase\HttpException;
 use Illuminate\Support\Facades\DB;
 
 class ConnectionTest extends TestCase
@@ -66,22 +64,6 @@ class ConnectionTest extends TestCase
     public function testQueryLog()
     {
         DB::enableQueryLog();
-
-        try {
-            DB::connection()->createCollection('items');
-        } catch (HttpException $exception) {
-            DB::connection()->dropCollection('items');
-            DB::connection()->createCollection('items');
-        }
-
-        // a newly created collection takes a bit to get online
-        sleep(2);
-
-        try {
-            DB::connection()->createPrimaryIndexForKeyspace(DB::connection()->getConfig('bucket'), '_default', 'items');
-        } catch (BaseException $exception) {
-            // primary index already exists, proceed
-        }
 
         $this->assertEquals(0, count(DB::getQueryLog()));
 

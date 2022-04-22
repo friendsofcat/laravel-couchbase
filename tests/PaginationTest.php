@@ -10,7 +10,6 @@ class PaginationTest extends TestCase
 
     public function testAll()
     {
-        $this->markTestSkipped();
         User::create(['name' => 'John Doe 1', 'abc' => 1]);
         User::create(['name' => 'John Doe 2', 'abc' => 1]);
         User::create(['name' => 'John Doe 3', 'abc' => 2]);
@@ -27,8 +26,6 @@ class PaginationTest extends TestCase
 
     public function testWhere()
     {
-        $this->markTestSkipped();
-
         $this->getCouchbaseConnection()->table('users')->insert(['name' => 'John Doe 1', 'abc' => 1]);
         $this->getCouchbaseConnection()->table('users')->insert(['name' => 'John Doe 2', 'abc' => 1]);
         $this->getCouchbaseConnection()->table('users')->insert(['name' => 'John Doe 3', 'abc' => 2]);
@@ -44,7 +41,6 @@ class PaginationTest extends TestCase
 
     public function testOrderBy()
     {
-        $this->markTestSkipped();
         $this->getCouchbaseConnection()->table('users')->insert(['name' => 'John Doe 1', 'abc' => 1]);
         $this->getCouchbaseConnection()->table('users')->insert(['name' => 'John Doe 2', 'abc' => 1]);
         $this->getCouchbaseConnection()->table('users')->insert(['name' => 'John Doe 3', 'abc' => 2]);

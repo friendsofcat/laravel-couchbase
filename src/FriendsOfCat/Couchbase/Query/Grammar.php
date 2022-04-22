@@ -160,12 +160,11 @@ class Grammar extends BaseGrammar
         // can build the query and concatenate all the pieces together as one.
         $original = $query->columns;
 
-        if (is_null($query->columns)) {
-            $query->columns = ['*'];
+        if (is_null($query->columns) || $query->columns === ['*']) {
+            $query->columns = [$this->wrapTable($query->connection->getBucketName()) . '.*'];
         }
 
-        if ($query->columns === ['*']) {
-            $query->columns = [$query->type . '.*'];
+        if ($query->columns === [$this->wrapTable($query->connection->getBucketName()) . '.*']) {
             $query->columns[] = self::VIRTUAL_META_ID_COLUMN;
         }
 
@@ -183,23 +182,6 @@ class Grammar extends BaseGrammar
         $query->columns = $original;
 
         return $sql;
-    }
-
-    protected function compileFrom(BaseBuilder $query, $table)
-    {
-        return "from {$this->keySpace($query)}";
-    }
-
-    protected function keySpace(Builder $query): string
-    {
-        $scope = $this->getScope($query);
-
-        return "{$this->wrapTable($query->from)}.`{$scope}`.{$this->wrapTable($query->type)}";
-    }
-
-    private function getScope(Builder $query): string
-    {
-        return $query->connection->getConfig('scope') ?? '_default';
     }
 
     /**
@@ -324,7 +306,7 @@ class Grammar extends BaseGrammar
      */
     public function getMetaIdExpression(BaseBuilder $query, $withAs = false)
     {
-        return new Expression('meta().' . $this->wrapValue('id') . ($withAs ? ' as ' . $this->wrapValue(self::VIRTUAL_META_ID_COLUMN) : ''));
+        return new Expression('meta(' . $this->wrapTable($query->getConnection()->getBucketName()) . ').' . $this->wrapValue('id') . ($withAs ? ' as ' . $this->wrapValue(self::VIRTUAL_META_ID_COLUMN) : ''));
     }
 
     /**
@@ -413,10 +395,8 @@ class Grammar extends BaseGrammar
      */
     public function compileUpdate(BaseBuilder $query, $values)
     {
-        $scope = $this->getScope($query);
-
         // keyspace-ref:
-        $table = "{$this->wrapTable($query->from)}.`{$scope}`.{$this->wrapTable($query->type)}";
+        $table = $this->wrapTable($query->from);
         // use keys/index clause:
         $useClause = $this->compileUse($query);
         // returning-clause
@@ -456,14 +436,12 @@ class Grammar extends BaseGrammar
         $setColumns = implode(', ', $columns + $forIns);
         $unsetColumns = implode(', ', $unsetColumns);
 
-        $ret = trim('update ' . $table
+        return trim('update ' . $table
             . ' ' . $useClause
             . ($setColumns ? (' set ' . $setColumns) : '')
             . ($unsetColumns ? (' unset ' . $unsetColumns) : '')
             . ' ' . $where
             . ' RETURNING ' . $returning);
-
-        return $ret;
     }
 
     /**
@@ -481,7 +459,7 @@ class Grammar extends BaseGrammar
         $returning = $this->compileReturning($query);
         $where = is_array($query->wheres) ? $this->compileWheres($query) : '';
 
-        return trim("delete from {$this->keySpace($query)} {$useClause} {$where} RETURNING {$returning}");
+        return trim("delete from {$table} {$useClause} {$where} RETURNING {$returning}");
     }
 
     /**

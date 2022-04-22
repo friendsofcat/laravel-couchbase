@@ -76,18 +76,14 @@ class HasMany extends EloquentHasMany
     /**
      * Add the constraints for a relationship query.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param \Illuminate\Database\Eloquent\Builder $parent
      * @param array|mixed $columns
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationQuery(Builder $query, Builder $parent, $columns = ['*'])
+    public function getRelationQuery()
     {
-        $query->select($columns);
+        $this->query->select(['*']);
 
-        $key = $this->wrap($this->getQualifiedParentKeyName());
-
-        return $query->whereNotNull($this->getHasCompareKey());
+        return $this->query->whereNotNull($this->getHasCompareKey());
     }
 
     /**

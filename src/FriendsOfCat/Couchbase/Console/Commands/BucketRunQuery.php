@@ -20,7 +20,7 @@ class BucketRunQuery extends Command
      *
      * @var string
      */
-    protected $description = 'Create a targerted index on bucket to allow performing N1QL queries';
+    protected $description = 'Create a targeted index on bucket to allow performing N1QL queries';
 
     public function handle()
     {

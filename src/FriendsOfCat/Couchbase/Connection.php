@@ -361,7 +361,19 @@ class Connection extends \Illuminate\Database\Connection
      */
     public function disconnect()
     {
-        unset($this->cluster);
+        $this->cluster = null;
+    }
+
+    public function reconnect()
+    {
+        $this->createConnection();
+    }
+
+    public function reconnectIfMissingConnection()
+    {
+        if (! $this->cluster) {
+            $this->reconnect();
+        }
     }
 
     /**

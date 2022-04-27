@@ -16,7 +16,7 @@ trait RefreshDatabase
 {
     public function refreshDatabase()
     {
-        // bucket flushing is too slow.
+        // TODO: bucket flushing is too slow.
         // Workaround: recreating the bucket ?
         Artisan::call(BucketFlush::class);
     }

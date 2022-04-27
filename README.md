@@ -26,10 +26,10 @@ Installation
 
 ## Couchbase compatibility
 
-| Couchbase | Eloquent driver |
-| --- | --- |
-| 6.x | 1.x |
-| 7.x | 2.x |
+| Couchbase | Eloquent driver | Php |
+| --- | --- | --- |
+| 6.x | 1.x | ^7.4 |
+| 7.x | 2.x | ^8.0 |
 
 Make sure you have the Couchbase PHP driver installed. You can find installation instructions at http://developer.couchbase.com/documentation/server/current/sdk/php/start-using-sdk.html
 
@@ -692,6 +692,7 @@ This is not a fully featured eloquent driver. There are still some areas where a
 - [ ] Test pagination
 - [ ] Helper `uniqueId`
 - [ ] custom `RefreshDatabase` trait to recreate bucket
+- [ ] add `LazilyRefreshDatabase` instead of RefreshDatabase
 Lead
 ```php
 // RefreshDatabase

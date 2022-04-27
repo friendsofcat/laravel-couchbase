@@ -8,7 +8,7 @@ jobs:
 
     services:
       couchbase:
-        image: couchbase:7.0.3
+        image: couchbase:6.6.0
         ports:
           - 8091-8094:8091-8094
           - 11210:11210

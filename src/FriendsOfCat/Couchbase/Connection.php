@@ -364,6 +364,18 @@ class Connection extends \Illuminate\Database\Connection
         $this->cluster = null;
     }
 
+    public function reconnect()
+    {
+        $this->createConnection();
+    }
+
+    public function reconnectIfMissingConnection()
+    {
+        if (! $this->cluster) {
+            $this->reconnect();
+        }
+    }
+
     /**
      * Create a DSN string from a configuration.
      *

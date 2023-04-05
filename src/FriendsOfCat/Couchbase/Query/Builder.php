@@ -196,11 +196,11 @@ class Builder extends BaseBuilder
     }
 
     /**
-     * @param string $name
+     * @param $name
      * @throws Exception
      * @return $this
      */
-    public function useIndex(string $name)
+    public function useIndex($name)
     {
         if ($this->keys !== null) {
             throw new Exception('Only one of useKeys or useIndex can be used, not both.');

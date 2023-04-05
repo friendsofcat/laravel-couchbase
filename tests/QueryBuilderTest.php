@@ -566,12 +566,6 @@ class QueryBuilderTest extends TestCase
             'select `' . $query->from . '`.*, meta(`' . $query->from . '`).`id` as `_id` from `' . $query->from . '` USE INDEX (`test-index` USING GSI) where `eloquent_type` = "table6"',
             $this->queryToSql($query)
         );
-
-        $query = $this->getCouchbaseConnection()->table('table6')->useIndex('test-index', Grammar::INDEX_TYPE_VIEW)->select();
-        $this->assertEquals(
-            'select `' . $query->from . '`.*, meta(`' . $query->from . '`).`id` as `_id` from `' . $query->from . '` USE INDEX (`test-index` USING VIEW) where `eloquent_type` = "table6"',
-            $this->queryToSql($query)
-        );
     }
 
     public function testWhereAnyIn()

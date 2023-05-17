@@ -412,7 +412,7 @@ abstract class Model extends BaseModel
      * Create a new Eloquent query builder for the model.
      *
      * @param \FriendsOfCat\Couchbase\Query\Builder $query
-     * @return \FriendsOfCat\Couchbase\Eloquent\Builder|static
+     * @return \FriendsOfCat\Couchbase\Eloquent\Builder
      */
     public function newEloquentBuilder($query)
     {

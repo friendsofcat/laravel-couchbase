@@ -6,12 +6,12 @@ namespace FriendsOfCat\Couchbase;
 
 use Couchbase\Bucket;
 use Couchbase\Cluster;
+use Couchbase\ScopeSpec;
 use Couchbase\BucketManager;
 use Couchbase\BucketSettings;
 use Couchbase\CollectionSpec;
-use Couchbase\ScopeSpec;
-use FriendsOfCat\Couchbase\Events\QueryFired;
 use FriendsOfCat\Couchbase\Query\Builder;
+use FriendsOfCat\Couchbase\Events\QueryFired;
 use FriendsOfCat\Couchbase\Query\Builder as QueryBuilder;
 use FriendsOfCat\Couchbase\Query\Grammar as QueryGrammar;
 

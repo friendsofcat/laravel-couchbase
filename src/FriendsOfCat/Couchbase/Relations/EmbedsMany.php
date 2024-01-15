@@ -48,6 +48,7 @@ class EmbedsMany extends EmbedsOneOrMany
         if ($model->getKeyName() == '_id' and ! $model->getKey()) {
             $model->setAttribute('_id', Helper::getUniqueId($model->{Helper::TYPE_NAME}));
         }
+
         // For deeply nested documents, let the parent handle the changes.
         if ($this->isNested()) {
             $this->associate($model);

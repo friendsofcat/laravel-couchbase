@@ -170,6 +170,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
             $thrownExceptionClass,
             'Failed to assert that ' . json_encode($thrownExceptionClass) . ' is a ErrorException.'
         );
+
         /** @var ErrorException $e */
         if ($messageRegex !== null) {
             $this->assertTrue(

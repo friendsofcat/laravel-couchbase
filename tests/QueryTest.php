@@ -11,15 +11,15 @@ class QueryTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-//        User::create(['name' => 'John Doe', 'age' => 35, 'title' => 'admin']);
-//        User::create(['name' => 'Jane Doe', 'age' => 33, 'title' => 'admin']);
-//        User::create(['name' => 'Harry Hoe', 'age' => 13, 'title' => 'user']);
-//        User::create(['name' => 'Robert Roe', 'age' => 37, 'title' => 'user']);
-//        User::create(['name' => 'Mark Moe', 'age' => 23, 'title' => 'user']);
-//        User::create(['name' => 'Brett Boe', 'age' => 35, 'title' => 'user']);
-//        User::create(['name' => 'Tommy Toe', 'age' => 33, 'title' => 'user']);
-//        User::create(['name' => 'Yvonne Yoe', 'age' => 35, 'title' => 'admin']);
-//        User::create(['name' => 'Error', 'age' => null, 'title' => null]);
+        //        User::create(['name' => 'John Doe', 'age' => 35, 'title' => 'admin']);
+        //        User::create(['name' => 'Jane Doe', 'age' => 33, 'title' => 'admin']);
+        //        User::create(['name' => 'Harry Hoe', 'age' => 13, 'title' => 'user']);
+        //        User::create(['name' => 'Robert Roe', 'age' => 37, 'title' => 'user']);
+        //        User::create(['name' => 'Mark Moe', 'age' => 23, 'title' => 'user']);
+        //        User::create(['name' => 'Brett Boe', 'age' => 35, 'title' => 'user']);
+        //        User::create(['name' => 'Tommy Toe', 'age' => 33, 'title' => 'user']);
+        //        User::create(['name' => 'Yvonne Yoe', 'age' => 35, 'title' => 'admin']);
+        //        User::create(['name' => 'Error', 'age' => null, 'title' => null]);
     }
 
     public function testWhere()

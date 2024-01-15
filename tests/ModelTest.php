@@ -2,11 +2,11 @@
 
 namespace Tests;
 
-use Illuminate\Support\Str;
 use Tests\Models\Book;
 use Tests\Models\Item;
 use Tests\Models\Soft;
 use Tests\Models\User;
+use Illuminate\Support\Str;
 
 class ModelTest extends TestCase
 {
@@ -22,16 +22,15 @@ class ModelTest extends TestCase
         $this->assertEquals('_id', $user->getKeyName());
     }
 
-    public function testSqlQuery ()
+    public function testSqlQuery()
     {
-      $this->markTestSkipped('High-priority test skipped');
+        $this->markTestSkipped('High-priority test skipped');
 
-      $query = 'select `:bucket`.*, meta(`:bucket`).`id` as `_id` from `:bucket` where `table` = ?';
-      $bucket = config('database.connections.couchbase.bucket');
-      $query = (string) Str::of($query)
-        ->replace(':bucket', $bucket);
-      $this->assertEquals($query, User::query()->toSql());
-
+        $query = 'select `:bucket`.*, meta(`:bucket`).`id` as `_id` from `:bucket` where `table` = ?';
+        $bucket = config('database.connections.couchbase.bucket');
+        $query = (string) Str::of($query)
+            ->replace(':bucket', $bucket);
+        $this->assertEquals($query, User::query()->toSql());
     }
 
     public function testInsert()

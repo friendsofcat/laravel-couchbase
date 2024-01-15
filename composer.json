@@ -5,11 +5,11 @@
     "homepage": "https://github.com/friendsoat/laravel-couchbase",
     "license" : "MIT",
     "require": {
-        "php": "^7.3|^8.0",
-        "illuminate/support": "^7.0|^8.0|^9.0",
-        "illuminate/container": "^7.0|^8.0|^9.0",
-        "illuminate/database": "^7.0|^8.0|^9.0",
-        "illuminate/events": "^7.0|^8.0|^9.0",
+        "php": "^8.0",
+        "illuminate/support": "^7.0|^8.0|^9.0|^10.0",
+        "illuminate/container": "^7.0|^8.0|^9.0|^10.0",
+        "illuminate/database": "^7.0|^8.0|^9.0|^10.0",
+        "illuminate/events": "^7.0|^8.0|^9.0|^10.0",
         "ext-couchbase": ">=3.0"
     },
     "require-dev": {
